@@ -50,7 +50,7 @@ export default function LandingPage() {
           <div className="bg-[#1B5E20] text-white p-2 rounded-xl shadow-sm">
             <Sprout size={24} />
           </div>
-          <span className="text-2xl font-bold font-poppins tracking-tight text-[#1B5E20]">CropDeck</span>
+          <span className="text-2xl font-bold font-poppins tracking-tight text-[#1B5E20]">HarvesttHub</span>
         </div>
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
           <a href="#features" className="hover:text-[#1B5E20] transition-colors">{t("landing.features")}</a>
@@ -321,7 +321,7 @@ export default function LandingPage() {
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <Sprout size={20} className="text-[#1B5E20]" />
-              <span className="text-xl font-bold font-poppins tracking-tight text-[#1B5E20]">CropDeck</span>
+              <span className="text-xl font-bold font-poppins tracking-tight text-[#1B5E20]">HarvesttHub</span>
             </div>
             <p className="text-slate-500 text-sm leading-relaxed max-w-xs">
               Building the operating system for global agriculture.
@@ -352,7 +352,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto pt-8 border-t border-gray-100 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-sm text-slate-400">
-          <p>© 2026 CropDeck. {t("landing.allRights")}</p>
+          <p>© 2026 HarvesttHub. {t("landing.allRights")}</p>
         </div>
       </footer>
     </div>
