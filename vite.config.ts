@@ -12,4 +12,13 @@ export default defineConfig({
       "react-i18next": path.resolve(__dirname, "./src/i18n/useTranslation.ts"),
     },
   },
+  server: {
+    proxy: {
+      // Proxy Netlify function calls to netlify dev server in development
+      '/.netlify/functions': {
+        target: 'http://localhost:8888',
+        changeOrigin: true,
+      },
+    },
+  },
 })
