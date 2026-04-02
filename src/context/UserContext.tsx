@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react"
-import { users, User } from "@/data/mock"
+import { User } from "@/data/mock"
 import { supabase } from "@/lib/supabase"
 
 interface UserContextType {
@@ -7,6 +7,8 @@ interface UserContextType {
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   signup: (email: string, password: string, name: string, role: string) => Promise<void>
+  sendOtp: (email: string) => Promise<void>
+  verifyOtp: (email: string, token: string, name: string, role: string) => Promise<void>
   logout: () => Promise<void>
   updateUser: (profile: Partial<User>) => Promise<void>
 }
@@ -48,12 +50,26 @@ export function UserProvider({ children }: { children: ReactNode }) {
         .eq('id', userId)
         .single()
 
-      if (error) throw error
+      if (error && error.code !== 'PGRST116') throw error
       if (data) setUser(data as User)
     } catch (error) {
       console.error('Error fetching profile:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const ensureProfile = async (userId: string, email: string, name: string, role: string) => {
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .single()
+
+    if (!existing) {
+      await supabase.from('profiles').insert([
+        { id: userId, name: name || email.split('@')[0], role: role || 'farmer' }
+      ])
     }
   }
 
@@ -84,6 +100,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const sendOtp = async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({ email })
+    if (error) throw error
+  }
+
+  const verifyOtp = async (email: string, token: string, name: string, role: string) => {
+    setLoading(true)
+    const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
+    if (error) {
+      setLoading(false)
+      throw error
+    }
+    if (data.user) {
+      await ensureProfile(data.user.id, email, name, role)
+      await fetchProfile(data.user.id)
+    }
+  }
+
   const logout = async () => {
     await supabase.auth.signOut()
     setUser(null)
@@ -107,7 +141,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <UserContext.Provider value={{ user, loading, login, signup, logout, updateUser }}>
+    <UserContext.Provider value={{ user, loading, login, signup, sendOtp, verifyOtp, logout, updateUser }}>
       {children}
     </UserContext.Provider>
   )

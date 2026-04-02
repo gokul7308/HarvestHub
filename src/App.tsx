@@ -12,6 +12,7 @@ import { Toaster } from 'sonner'
 import DashboardLayout from './layouts/DashboardLayout'
 import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
+import OTPLogin from './pages/auth/OTPLogin'
 import FarmerDashboard from './pages/FarmerDashboard'
 import MerchantDashboard from './pages/MerchantDashboard'
 import AdminDashboard from './pages/AdminDashboard'
@@ -53,6 +54,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/auth" element={<AuthPage />} />
+      <Route path="/auth/otp" element={<OTPLogin />} />
       
       <Route element={<DashboardLayout />}>
         <Route path="/farmer" element={

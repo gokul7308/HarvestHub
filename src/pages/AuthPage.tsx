@@ -394,6 +394,15 @@ export default function AuthPage() {
                       🛠️ Admin
                     </Button>
                   </div>
+                  {/* OTP Option */}
+                  <div className="mt-4 pt-4 border-t border-slate-50 text-center">
+                    <Link
+                      to="/auth/otp"
+                      className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#1B5E20] hover:opacity-70 transition-opacity"
+                    >
+                      🔐 Sign in with Email OTP instead
+                    </Link>
+                  </div>
                 </div>
               </motion.form>
             </AnimatePresence>
