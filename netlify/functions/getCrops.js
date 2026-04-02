@@ -1,8 +1,9 @@
-const { createClient } = require('@supabase/supabase-js')
+const { createServerClient } = require('@supabase/ssr')
 
-const supabase = createClient(
+const supabase = createServerClient(
   process.env.VITE_SUPABASE_URL,
-  process.env.VITE_SUPABASE_ANON_KEY
+  process.env.VITE_SUPABASE_ANON_KEY,
+  { cookies: { getAll: () => [], setAll: () => {} } }
 )
 
 exports.handler = async (event, context) => {
