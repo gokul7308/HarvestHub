@@ -19,5 +19,10 @@ const supabaseKey =
  * Creates a Supabase browser client with cookie-based session handling.
  * @supabase/ssr automatically manages auth tokens in cookies for you.
  */
-export const createClient = () =>
-  createBrowserClient(supabaseUrl!, supabaseKey!);
+export const createClient = () => {
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Supabase credentials missing! Ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your environment.');
+    // Return a dummy client or handle it to prevent immediate crash if possible
+  }
+  return createBrowserClient(supabaseUrl || '', supabaseKey || '');
+};

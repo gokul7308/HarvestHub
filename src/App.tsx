@@ -149,26 +149,58 @@ function AppRoutes() {
   )
 }
 
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: Error | null }> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: Error) { return { hasError: true, error }; }
+  componentDidCatch(error: Error, errorInfo: any) { console.error("HarvestHub Error Boundary:", error, errorInfo); }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="h-screen w-screen flex items-center justify-center bg-red-50 p-8 text-center font-sans">
+          <div className="max-w-md bg-white rounded-3xl p-10 shadow-2xl shadow-red-100 border-2 border-red-50">
+            <h1 className="text-4xl mb-4 font-black text-red-600">Something went wrong.</h1>
+            <p className="text-slate-500 font-medium mb-6">The application failed to initialize. This is often caused by missing Supabase environment variables on Netlify.</p>
+            <pre className="text-[10px] text-left bg-slate-50 p-4 rounded-xl overflow-auto border border-slate-100 mb-6 max-h-40">
+              {this.state.error?.message}
+            </pre>
+            <button onClick={() => window.location.reload()} className="w-full h-12 bg-red-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-red-100">Try Again</button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function App() {
+  React.useEffect(() => {
+    console.log("🚀 HarvestHub Initializing...");
+  }, []);
+
   return (
-    <ThemeProvider>
-      <UserProvider>
-        <SettingsProvider>
-          <ListingProvider>
-            <DemandProvider>
-              <OrderProvider>
-                <NegotiationProvider>
-                  <BrowserRouter>
-                    <AppRoutes />
-                    <Toaster position="top-right" richColors theme="light" />
-                  </BrowserRouter>
-                </NegotiationProvider>
-              </OrderProvider>
-            </DemandProvider>
-          </ListingProvider>
-        </SettingsProvider>
-      </UserProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <UserProvider>
+          <SettingsProvider>
+            <ListingProvider>
+              <DemandProvider>
+                <OrderProvider>
+                  <NegotiationProvider>
+                    <BrowserRouter>
+                      <AppRoutes />
+                      <Toaster position="top-right" richColors theme="light" />
+                    </BrowserRouter>
+                  </NegotiationProvider>
+                </OrderProvider>
+              </DemandProvider>
+            </ListingProvider>
+          </SettingsProvider>
+        </UserProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   )
 }
 
