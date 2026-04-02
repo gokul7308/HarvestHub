@@ -2,7 +2,7 @@ import { UserSettings } from '../types/settings';
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-const SETTINGS_KEY = 'cropdeck_user_settings';
+const SETTINGS_KEY = 'harvesthub_user_settings';
 
 const defaultSettings: UserSettings = {
   profile: {
