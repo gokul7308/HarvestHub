@@ -5,7 +5,8 @@ import { supabase } from "@/lib/supabase"
 interface UserContextType {
   user: User | null
   loading: boolean
-  login: (role: 'farmer' | 'merchant' | 'admin') => Promise<void>
+  login: (email: string, password: string) => Promise<void>
+  signup: (email: string, password: string, name: string, role: string) => Promise<void>
   logout: () => Promise<void>
   updateUser: (profile: Partial<User>) => Promise<void>
 }
@@ -56,12 +57,31 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const login = async (role: 'farmer' | 'merchant' | 'admin') => {
-    // For demo purposes, we still use mock users if not logged into real supabase
-    // But in a real app, this would use supabase.auth.signInWithPassword()
-    const mockUser = users[role]
-    setUser(mockUser)
-    setLoading(false)
+  const login = async (email: string, password: string) => {
+    setLoading(true)
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      setLoading(false)
+      throw error
+    }
+  }
+
+  const signup = async (email: string, password: string, name: string, role: string) => {
+    setLoading(true)
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          role: role
+        }
+      }
+    })
+    if (error) {
+      setLoading(false)
+      throw error
+    }
   }
 
   const logout = async () => {
@@ -87,7 +107,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <UserContext.Provider value={{ user, loading, login, logout, updateUser }}>
+    <UserContext.Provider value={{ user, loading, login, signup, logout, updateUser }}>
       {children}
     </UserContext.Provider>
   )

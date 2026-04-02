@@ -28,20 +28,20 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
 
   const fetchListings = async () => {
     try {
-      const { data: listingsData, error: listingsError } = await supabase
-        .from('listings')
+      const { data: cropsData, error: cropsError } = await supabase
+        .from('crops')
         .select(`
           *,
           offers (*)
         `)
         .order('created_at', { ascending: false });
 
-      if (listingsError) throw listingsError;
+      if (cropsError) throw cropsError;
       
-      if (listingsData) {
-        setListings(listingsData.map(l => ({
+      if (cropsData) {
+        setListings(cropsData.map(l => ({
           ...l,
-          offers: l.offers.map((o: any) => ({
+          offers: (l.offers || []).map((o: any) => ({
             ...o,
             status: o.status as OfferStatus
           }))
@@ -62,7 +62,7 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const { data, error } = await supabase
-        .from('listings')
+        .from('crops')
         .insert([{
           ...listing,
           farmer_id: user.id,
@@ -85,7 +85,7 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
   const updateListing = async (id: string, updates: Partial<Listing>) => {
     try {
       const { error } = await supabase
-        .from('listings')
+        .from('crops')
         .update(updates)
         .eq('id', id);
 
@@ -102,7 +102,7 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
   const deleteListing = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('listings')
+        .from('crops')
         .delete()
         .eq('id', id);
 

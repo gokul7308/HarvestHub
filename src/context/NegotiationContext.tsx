@@ -44,19 +44,19 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
         .from('offers')
         .select(`
           *,
-          listings (name, farmer_id, profiles!listings_farmer_id_fkey(name)),
+          crops (name, farmer_id, profiles!crops.farmer_id_fkey(name)),
           buyer:buyer_id(name)
         `)
-        .or(`buyer_id.eq.${user.id},listings.farmer_id.eq.${user.id}`);
+        .or(`buyer_id.eq.${user.id},crops.farmer_id.eq.${user.id}`);
 
       if (error) throw error;
       
       if (data) {
         setNegotiations(data.map((o: any) => ({
           id: o.id,
-          crop_name: o.listings?.name,
+          crop_name: o.crops?.name,
           buyer_name: o.buyer?.name,
-          seller_name: o.listings?.profiles?.name,
+          seller_name: o.crops?.profiles?.name,
           price: `$${o.price} / kg`,
           status: o.status as any,
           listing_id: o.listing_id

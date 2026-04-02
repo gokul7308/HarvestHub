@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { ShoppingCart, TrendingUp, Handshake, Target, ArrowRight, Search, MapPin, Building2, ShoppingBag, Clock, CheckCircle2, XCircle } from "lucide-react"
-import { marketplaceListings } from "@/data/mock"
+import { useListings } from "@/context/ListingContext"
 import { useTranslation } from "react-i18next"
 
 const categoryData = [
@@ -23,6 +23,7 @@ const categoryData = [
 ]
 
 export default function MerchantDashboard() {
+  const { listings } = useListings()
   const { user } = useUser()
   const { t } = useTranslation()
   const { negotiations } = useNegotiations()
@@ -172,8 +173,13 @@ export default function MerchantDashboard() {
               </button>
             </div>
             
-            <div className="grid gap-6">
-              {marketplaceListings.slice(0, 3).map((item, i) => (
+            <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
+            {listings.slice(0, 4).map((item, i) => {
+              const name = item.name;
+              const price = `$${item.price.toFixed(2)}`;
+              const quantity = `${item.quantity} ${item.unit}`;
+              const image = item.images?.[0] || "https://images.unsplash.com/photo-1592919016327-029094770fc5?w=800&auto=format&fit=crop&q=60";
+              return (
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.95 }}
                   whileInView={{ opacity: 1, scale: 1 }}
@@ -183,20 +189,20 @@ export default function MerchantDashboard() {
                   className="bg-white rounded-[32px] p-6 border-2 border-slate-50 flex flex-col sm:flex-row items-center gap-8 hover:shadow-[0_20px_50px_rgb(0,0,0,0.06)] hover:border-slate-100 transition-all group cursor-pointer"
                 >
                   <div className="w-full sm:w-40 h-32 rounded-[24px] overflow-hidden shrink-0 border-2 border-slate-50">
-                    <img src={item.image} alt={item.cropName} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" />
+                    <img src={image} alt={name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" />
                   </div>
                   <div className="flex-1 w-full min-w-0">
                     <div className="flex justify-between items-start mb-2">
                        <div>
-                          <h3 className="font-black text-xl text-slate-900 tracking-tight truncate leading-none mb-1">{item.cropName}</h3>
+                          <h3 className="font-black text-xl text-slate-900 tracking-tight truncate leading-none mb-1">{name}</h3>
                           <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
                             <span className="flex items-center gap-1.5"><MapPin size={12} className="text-amber-500" /> {item.location}</span>
-                            <span className="flex items-center gap-1.5"><Building2 size={12} className="text-blue-500" /> {item.farmerName}</span>
+                            <span className="flex items-center gap-1.5"><Building2 size={12} className="text-blue-500" /> Green Farm Co.</span>
                           </div>
                        </div>
                        <div className="text-right shrink-0">
-                         <div className="font-black text-2xl text-blue-600 tracking-tighter leading-none">{item.price}</div>
-                         <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">{t("dashboard.quantity")}: {item.quantity}</div>
+                         <div className="font-black text-2xl text-blue-600 tracking-tighter leading-none">{price}</div>
+                         <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">{t("dashboard.quantity")}: {quantity}</div>
                        </div>
                     </div>
                     <div className="flex gap-4 mt-6">
@@ -209,8 +215,9 @@ export default function MerchantDashboard() {
                     </div>
                   </div>
                 </motion.div>
-              ))}
-            </div>
+              );
+            })}
+          </div>
           </div>
         </div>
 

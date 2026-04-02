@@ -14,29 +14,48 @@ export default function AuthPage() {
   const [isLangOpen, setIsLangOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const { login } = useUser()
+  const [name, setName] = useState('')
+  const { login, signup } = useUser()
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    await new Promise(r => setTimeout(r, 1500))
-    login(role)
-    navigate(`/${role}`)
-    setIsLoading(false)
+    try {
+      if (isLogin) {
+        await login(email, password)
+      } else {
+        await signup(email, password, name, role)
+        alert("Verification email sent! Please check your inbox.")
+        setIsLogin(true)
+      }
+      // Redirection will happen automatically via UserContext/App protection if session is detected,
+      // but for immediate ux:
+      if (isLogin) {
+         // Wait for profile fetch in context
+         setTimeout(() => navigate('/'), 500)
+      }
+    } catch (error: any) {
+      alert(error.message || "Authentication failed")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleDemoLogin = async (demoRole: 'farmer' | 'merchant' | 'admin') => {
-    setRole(demoRole)
-    setEmail(`${demoRole}@harvesthub.com`)
-    setPassword('123456')
+    // Demo login is now restricted to real accounts or I can keep a shortcut for devs
+    setEmail(`${demoRole}@harvest.com`)
+    setPassword('password123')
     setIsLoading(true)
-    // Simulate auto-fill delay
-    await new Promise(r => setTimeout(r, 800))
-    login(demoRole)
-    navigate(`/${demoRole}`)
-    setIsLoading(false)
+    try {
+      await login(`${demoRole}@harvest.com`, 'password123')
+      navigate(`/${demoRole}`)
+    } catch (error) {
+       alert("Demo account not found. Please sign up first.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const roleConfig = {
@@ -301,7 +320,7 @@ export default function AuthPage() {
                   <div className="space-y-2.5">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">{t("auth.fullName")}</label>
                     <div className="relative group">
-                       <Input type="text" placeholder="Johnathan Miller" required className="pl-14 h-16 rounded-2xl bg-slate-50/50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-[#1B5E20]/5 focus:border-[#1B5E20] transition-all duration-300 border-2" />
+                       <Input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Johnathan Miller" required className="pl-14 h-16 rounded-2xl bg-slate-50/50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-[#1B5E20]/5 focus:border-[#1B5E20] transition-all duration-300 border-2" />
                        <Briefcase className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#1B5E20] transition-colors" size={20} />
                     </div>
                   </div>
