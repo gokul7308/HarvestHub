@@ -230,7 +230,7 @@ export default function MarketplacePage() {
                           onClick={(e) => {
                             e.stopPropagation();
                             addNegotiation({
-                              listing_id: item.id || 'mock-id',
+                              crop_id: item.id || 'mock-id',
                               price: typeof item.price === 'number' ? item.price : parseFloat(item.price.replace(/[^0-9.]/g, '')),
                                quantity: typeof item.quantity === 'number' ? item.quantity : parseFloat(item.quantity.replace(/[^0-9.]/g, '')),
                               message: `Interest in ${name}`

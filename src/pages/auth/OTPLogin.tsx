@@ -5,6 +5,7 @@ import { useUser } from "@/context/UserContext"
 import { Sprout, Mail, ArrowRight, Loader2, ShieldCheck, ChevronLeft, Check, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { toast } from "sonner"
 
 const ROLES = ['farmer', 'merchant', 'admin'] as const
 type Role = typeof ROLES[number]
@@ -25,10 +26,8 @@ export default function OTPLogin() {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [role, setRole] = useState<Role>('farmer')
-  const [otp, setOtp] = useState(['', '', '', '', '', ''])
+  const [otp, setOtp] = useState<string[]>(Array(8).fill(''))
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
   const [resendCooldown, setResendCooldown] = useState(0)
   const [isNewUser, setIsNewUser] = useState(true)
 
@@ -36,7 +35,7 @@ export default function OTPLogin() {
 
   // If already logged in, redirect
   useEffect(() => {
-    if (user) navigate(`/${user.role}`, { replace: true })
+    if (user) navigate(`/${user.role}-dashboard`, { replace: true })
   }, [user, navigate])
 
   // Cooldown timer
@@ -57,16 +56,14 @@ export default function OTPLogin() {
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) return
-    setError('')
-    setSuccess('')
     setLoading(true)
     try {
       await sendOtp(email)
       setStep('otp')
-      setSuccess('OTP sent! Check your inbox.')
-      setResendCooldown(60)
+      toast.success('OTP sent! Check your inbox.')
+      setResendCooldown(30)
     } catch (err: any) {
-      setError(err.message || 'Failed to send OTP. Please try again.')
+      toast.error(err.message || 'Failed to send OTP. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -78,9 +75,9 @@ export default function OTPLogin() {
     next[index] = value
     setOtp(next)
     // Auto-advance
-    if (value && index < 5) otpRefs.current[index + 1]?.focus()
+    if (value && index < 7) otpRefs.current[index + 1]?.focus()
     // Auto-submit when all filled
-    if (next.every(d => d) && next.join('').length === 6) {
+    if (next.every(d => d) && next.join('').length === 8) {
       handleVerifyOtp(next.join(''))
     }
   }
@@ -90,28 +87,33 @@ export default function OTPLogin() {
       otpRefs.current[index - 1]?.focus()
     }
     if (e.key === 'ArrowLeft' && index > 0) otpRefs.current[index - 1]?.focus()
-    if (e.key === 'ArrowRight' && index < 5) otpRefs.current[index + 1]?.focus()
+    if (e.key === 'ArrowRight' && index < 7) otpRefs.current[index + 1]?.focus()
   }
 
   const handleOtpPaste = (e: React.ClipboardEvent) => {
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
-    if (pasted.length === 6) {
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 8)
+    if (pasted.length === 8) {
       const next = pasted.split('')
       setOtp(next)
-      otpRefs.current[5]?.focus()
+      otpRefs.current[7]?.focus()
       handleVerifyOtp(pasted)
     }
   }
 
   const handleVerifyOtp = async (token: string) => {
-    setError('')
     setLoading(true)
     try {
       await verifyOtp(email, token, name, role)
+      toast.success('Successfully verified!')
       // Navigation handled by the useEffect watching `user`
     } catch (err: any) {
-      setError(err.message || 'Invalid OTP. Please try again.')
-      setOtp(['', '', '', '', '', ''])
+      const msg = err.message?.toLowerCase() || ''
+      if (msg.includes('expired') || msg.includes('invalid')) {
+        toast.error('OTP expired. Please resend a new code.')
+      } else {
+        toast.error(err.message || 'Invalid OTP. Please try again.')
+      }
+      setOtp(Array(8).fill(''))
       otpRefs.current[0]?.focus()
     } finally {
       setLoading(false)
@@ -119,23 +121,22 @@ export default function OTPLogin() {
   }
 
   const handleVerifyClick = () => {
-    const token = otp.join('')
-    if (token.length < 6) { setError('Enter all 6 digits.'); return }
-    handleVerifyOtp(token)
+    const otpValue = otp.join('')
+    if (otpValue.length !== 8) { toast.error('Enter complete OTP'); return; }
+    handleVerifyOtp(otpValue)
   }
 
   const handleResend = async () => {
     if (resendCooldown > 0) return
-    setError('')
     setLoading(true)
     try {
       await sendOtp(email)
-      setSuccess('OTP resent!')
-      setOtp(['', '', '', '', '', ''])
-      setResendCooldown(60)
+      toast.success('OTP resent!')
+      setOtp(Array(8).fill(''))
+      setResendCooldown(30)
       otpRefs.current[0]?.focus()
     } catch (err: any) {
-      setError(err.message || 'Failed to resend OTP.')
+      toast.error(err.message || 'Failed to resend OTP.')
     } finally {
       setLoading(false)
     }
@@ -299,12 +300,6 @@ export default function OTPLogin() {
                     </div>
                   </div>
 
-                  {error && (
-                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                      className="text-red-500 text-xs font-bold bg-red-50 border border-red-100 rounded-2xl px-4 py-3"
-                    >{error}</motion.p>
-                  )}
-
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                     <Button type="submit" disabled={loading}
                       className="w-full h-14 rounded-2xl bg-gradient-to-r from-[#1B5E20] to-[#2E7D32] text-white font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-[#1B5E20]/20 hover:brightness-110 transition-all disabled:opacity-60 flex items-center justify-center gap-3"
@@ -328,7 +323,7 @@ export default function OTPLogin() {
                 transition={{ duration: 0.35 }}
               >
                 {/* Back */}
-                <button onClick={() => { setStep('email'); setError(''); setSuccess(''); setOtp(['','','','','','']) }}
+                <button onClick={() => { setStep('email'); setOtp(Array(8).fill('')) }}
                   className="flex items-center gap-2 text-slate-400 hover:text-slate-700 text-xs font-black uppercase tracking-widest mb-8 transition-colors"
                 >
                   <ChevronLeft size={16} /> Change Email
@@ -340,13 +335,13 @@ export default function OTPLogin() {
                   </div>
                   <h2 className="text-4xl font-black font-poppins text-slate-900 tracking-tighter mb-2">Check Your Email</h2>
                   <p className="text-slate-500 font-medium">
-                    We sent a 6-digit OTP to<br />
+                    Enter the OTP sent to your email<br />
                     <span className="font-black text-slate-800">{masked}</span>
                   </p>
                 </div>
 
-                {/* OTP boxes */}
-                <div className="flex gap-3 justify-center mb-8" onPaste={handleOtpPaste}>
+                {/* 8 OTP boxes */}
+                <div className="flex gap-2 justify-center mb-8" onPaste={handleOtpPaste}>
                   {otp.map((digit, i) => (
                     <input key={i}
                       ref={el => { otpRefs.current[i] = el }}
@@ -357,28 +352,16 @@ export default function OTPLogin() {
                       onChange={e => handleOtpChange(i, e.target.value)}
                       onKeyDown={e => handleOtpKeyDown(i, e)}
                       disabled={loading}
-                      className={`w-12 h-14 text-center text-2xl font-black rounded-2xl border-2 transition-all outline-none bg-white
-                        ${digit ? 'border-[#1B5E20] bg-[#F0FDF4] text-[#1B5E20]' : 'border-slate-200 text-slate-900'}
+                      className={`w-[42px] h-[52px] text-center text-2xl font-black rounded-[14px] border-2 transition-all outline-none bg-white shadow-sm
+                        ${digit ? 'border-[#1B5E20] bg-[#F0FDF4] text-[#1B5E20] shadow-[#1B5E20]/10' : 'border-slate-200 text-slate-900'}
                         focus:border-[#1B5E20] focus:ring-4 focus:ring-[#1B5E20]/10
                         disabled:opacity-50 disabled:cursor-not-allowed`}
                     />
                   ))}
                 </div>
 
-                {error && (
-                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="text-red-500 text-xs font-bold bg-red-50 border border-red-100 rounded-2xl px-4 py-3 mb-4 text-center"
-                  >{error}</motion.p>
-                )}
-
-                {success && (
-                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="text-green-700 text-xs font-bold bg-green-50 border border-green-100 rounded-2xl px-4 py-3 mb-4 text-center"
-                  >✅ {success}</motion.p>
-                )}
-
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} className="mb-5">
-                  <Button onClick={handleVerifyClick} disabled={loading || otp.join('').length < 6}
+                  <Button onClick={handleVerifyClick} disabled={loading || otp.join('').length !== 8}
                     className="w-full h-14 rounded-2xl bg-gradient-to-r from-[#1B5E20] to-[#2E7D32] text-white font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-[#1B5E20]/20 hover:brightness-110 transition-all disabled:opacity-60 flex items-center justify-center gap-3"
                   >
                     {loading ? <Loader2 size={22} className="animate-spin" /> : <><ShieldCheck size={18} /> Verify OTP <ArrowRight size={16} /></>}

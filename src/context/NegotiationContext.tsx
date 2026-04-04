@@ -10,13 +10,13 @@ export interface Negotiation {
   seller_name: string;
   price: string;
   status: 'Pending' | 'Accepted' | 'Rejected';
-  listing_id: string;
+  crop_id: string;
 }
 
 interface NegotiationContextType {
   negotiations: Negotiation[];
   loading: boolean;
-  addNegotiation: (negotiation: { listing_id: string, price: number, quantity: number, message?: string }) => Promise<void>;
+  addNegotiation: (negotiation: { crop_id: string, price: number, quantity: number, message?: string }) => Promise<void>;
   acceptNegotiation: (id: string, listingId: string) => Promise<void>;
   rejectNegotiation: (id: string) => Promise<void>;
 }
@@ -44,7 +44,7 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
         .from('offers')
         .select(`
           *,
-          crops (name, farmer_id, profiles!crops.farmer_id_fkey(name)),
+          crops (crop_name, farmer_id, profiles!crops.farmer_id_fkey(name)),
           buyer:buyer_id(name)
         `)
         .or(`buyer_id.eq.${user.id},crops.farmer_id.eq.${user.id}`);
@@ -54,12 +54,12 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
       if (data) {
         setNegotiations(data.map((o: any) => ({
           id: o.id,
-          crop_name: o.crops?.name,
+          crop_name: o.crops?.crop_name,
           buyer_name: o.buyer?.name,
           seller_name: o.crops?.profiles?.name,
           price: `$${o.price} / kg`,
           status: o.status as any,
-          listing_id: o.listing_id
+          crop_id: o.crop_id
         })));
       }
     } catch (error) {
@@ -69,7 +69,7 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
     }
   };
 
-  const addNegotiation = async (offer: { listing_id: string, price: number, quantity: number, message?: string }) => {
+  const addNegotiation = async (offer: { crop_id: string, price: number, quantity: number, message?: string }) => {
     if (!user) return;
     try {
       const { error } = await supabase

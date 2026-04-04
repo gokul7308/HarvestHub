@@ -59,16 +59,16 @@ export default function MerchantDashboard() {
           </CardContent>
         </Card>
 
-        <Card onClick={() => navigate("/merchant/orders")} className="rounded-[32px] border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_60px_rgb(0,0,0,0.08)] transition-all bg-white group border-2 cursor-pointer">
+        <Card onClick={() => navigate("/merchant-dashboard/orders")} className="rounded-[32px] border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_60px_rgb(0,0,0,0.08)] transition-all bg-white group border-2 cursor-pointer">
           <CardContent className="p-8">
             <div className="flex justify-between items-start mb-6">
               <div className="p-3 bg-slate-50 text-slate-400 rounded-2xl group-hover:bg-[#F0FDF4] group-hover:text-[#1B5E20] transition-colors">
                 <ShoppingBag size={24} />
               </div>
-              <Badge className="bg-[#1B5E20] text-white border-0 font-black text-[9px] uppercase tracking-widest">2 {t("merchant.inTransit")}</Badge>
+              <Badge className="bg-[#1B5E20] text-white border-0 font-black text-[9px] uppercase tracking-widest">Active {t("merchant.inTransit")}</Badge>
             </div>
             <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">{t("merchant.activeOrders")}</h3>
-            <p className="text-4xl font-black mt-2 text-slate-900 font-poppins tracking-tighter">8</p>
+            <p className="text-4xl font-black mt-2 text-slate-900 font-poppins tracking-tighter">{myNegotiations.filter(n => n.status === 'Accepted').length}</p>
           </CardContent>
         </Card>
 

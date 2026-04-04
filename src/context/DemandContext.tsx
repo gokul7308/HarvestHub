@@ -46,7 +46,13 @@ export function DemandProvider({ children }: { children: React.ReactNode }) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      if (data) setDemands(data as Demand[]);
+      if (data) {
+        setDemands(data.map((d: any) => ({
+          ...d,
+          crop: d.crop_name, // compat
+          price: d.budget // compat
+        })) as Demand[]);
+      }
     } catch (error) {
       console.error('Error fetching demands:', error);
     } finally {
@@ -54,7 +60,7 @@ export function DemandProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addDemand = async (demand: Omit<Demand, 'id' | 'status' | 'created_at' | 'buyer_id' >) => {
+  const addDemand = async (demand: any) => {
     if (!user) {
       toast.error("You must be logged in to post a demand");
       return;
@@ -64,8 +70,12 @@ export function DemandProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase
         .from('demands')
         .insert([{
-          ...demand,
-          buyer_id: user.id,
+          crop_name: demand.crop,
+          quantity: demand.quantity,
+          budget: demand.price,
+          location: demand.location,
+          notes: demand.notes,
+          merchant_id: user.id,
           status: 'open'
         }])
         .select(`

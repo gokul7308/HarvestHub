@@ -27,6 +27,7 @@ import AdminListingsPage from './pages/admin/AdminListingsPage'
 import RevenuePage from './pages/admin/RevenuePage'
 import MerchantDemandsPage from './pages/merchant/MerchantDemandsPage'
 import MerchantOrdersPage from './pages/merchant/MerchantOrdersPage'
+import UnauthorizedPage from './pages/UnauthorizedPage'
 
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) {
   const { user, loading } = useUser()
@@ -44,7 +45,7 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode,
 
   if (!user) return <Navigate to="/auth" />
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to={`/${user.role}`} />
+    return <Navigate to="/unauthorized" />
   }
   return <>{children}</>
 }
@@ -55,31 +56,32 @@ function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/auth/otp" element={<OTPLogin />} />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
       
       <Route element={<DashboardLayout />}>
-        <Route path="/farmer" element={
+        <Route path="/farmer-dashboard" element={
           <ProtectedRoute allowedRoles={['farmer']}>
             <FarmerDashboard />
           </ProtectedRoute>
         } />
-        <Route path="/merchant" element={
+        <Route path="/merchant-dashboard" element={
           <ProtectedRoute allowedRoles={['merchant']}>
             <MerchantDashboard />
           </ProtectedRoute>
         } />
         
-        <Route path="/merchant/demands" element={
+        <Route path="/merchant-dashboard/demands" element={
           <ProtectedRoute allowedRoles={['merchant']}>
             <MerchantDemandsPage />
           </ProtectedRoute>
         } />
 
-        <Route path="/merchant/orders" element={
+        <Route path="/merchant-dashboard/orders" element={
           <ProtectedRoute allowedRoles={['merchant']}>
             <MerchantOrdersPage />
           </ProtectedRoute>
         } />
-        <Route path="/admin" element={
+        <Route path="/admin-dashboard" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <AdminDashboard />
           </ProtectedRoute>
@@ -139,9 +141,9 @@ function AppRoutes() {
           </ProtectedRoute>
         } />
         
-        <Route path="/farmer/*" element={<Navigate to="/farmer" />} />
-        <Route path="/merchant/*" element={<Navigate to="/merchant" />} />
-        <Route path="/admin/*" element={<Navigate to="/admin" />} />
+        <Route path="/farmer/*" element={<Navigate to="/farmer-dashboard" />} />
+        <Route path="/merchant/*" element={<Navigate to="/merchant-dashboard" />} />
+        <Route path="/admin/*" element={<Navigate to="/admin-dashboard" />} />
       </Route>
       
       <Route path="*" element={<Navigate to="/" />} />

@@ -11,6 +11,9 @@ interface UserContextType {
   verifyOtp: (email: string, token: string, name: string, role: string) => Promise<void>
   logout: () => Promise<void>
   updateUser: (profile: Partial<User>) => Promise<void>
+  signInWithGoogle: (role: string) => Promise<void>
+  resetPassword: (email: string) => Promise<void>
+  setDemoUser: (role: 'farmer' | 'merchant' | 'admin') => void
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
@@ -30,8 +33,16 @@ export function UserProvider({ children }: { children: ReactNode }) {
     })
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth Event:", event, session?.user?.email)
       if (session) {
+        // For OAuth users, we might need to ensure the profile exists
+        const storedRole = localStorage.getItem('pending_role') || 'farmer'
+        const fullNameFromMeta = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User'
+        
+        await ensureProfile(session.user.id, session.user.email || '', fullNameFromMeta, storedRole)
+        localStorage.removeItem('pending_role') // Clean up
+        
         fetchProfile(session.user.id)
       } else {
         setUser(null)
@@ -68,7 +79,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     if (!existing) {
       await supabase.from('profiles').insert([
-        { id: userId, name: name || email.split('@')[0], role: role || 'farmer' }
+        { id: userId, email, name: name || email.split('@')[0], role: role || 'farmer' }
       ])
     }
   }
@@ -107,7 +118,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const verifyOtp = async (email: string, token: string, name: string, role: string) => {
     setLoading(true)
-    const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
+    const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'magiclink' })
     if (error) {
       setLoading(false)
       throw error
@@ -140,8 +151,52 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const signInWithGoogle = async (role: string) => {
+    localStorage.setItem('pending_role', role)
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: "https://harvest-hub-alpha.vercel.app",
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      }
+    })
+    if (error) throw error
+  }
+
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth`,
+    })
+    if (error) throw error
+  }
+
+  const setDemoUser = (role: 'farmer' | 'merchant' | 'admin') => {
+    const mockProfiles = {
+      farmer: { id: 'demo-farmer', email: 'farmer@demo.com', name: 'Demo Farmer', role: 'farmer' },
+      merchant: { id: 'demo-merchant', email: 'merchant@demo.com', name: 'Demo Merchant', role: 'merchant' },
+      admin: { id: 'demo-admin', email: 'admin@demo.com', name: 'Demo Admin', role: 'admin' }
+    }
+    setUser(mockProfiles[role] as User)
+    setLoading(false)
+  }
+
   return (
-    <UserContext.Provider value={{ user, loading, login, signup, sendOtp, verifyOtp, logout, updateUser }}>
+    <UserContext.Provider value={{ 
+      user, 
+      loading, 
+      login, 
+      signup, 
+      sendOtp, 
+      verifyOtp, 
+      logout, 
+      updateUser,
+      signInWithGoogle,
+      resetPassword,
+      setDemoUser
+    }}>
       {children}
     </UserContext.Provider>
   )

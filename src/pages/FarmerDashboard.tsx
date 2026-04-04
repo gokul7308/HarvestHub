@@ -122,7 +122,7 @@ export default function FarmerDashboard() {
               )}
             </div>
             <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">{t("dashboard.marketDemand")}</h3>
-            <p className="text-4xl font-black mt-2 text-[#1B5E20] font-poppins tracking-tighter uppercase">High</p>
+            <p className="text-4xl font-black mt-2 text-[#1B5E20] font-poppins tracking-tighter uppercase">{pendingNegotiations.length > 3 ? 'High' : 'Normal'}</p>
           </CardContent>
         </Card>
       </div>
@@ -222,7 +222,7 @@ export default function FarmerDashboard() {
                           <div className="text-xl font-black text-[#1B5E20] leading-none">{n.price}</div>
                         </div>
                         <div className="flex gap-2">
-                          <Button size="icon" onClick={() => acceptNegotiation(n.id, n.listing_id)} className="bg-[#1B5E20] hover:bg-[#144917] h-10 w-10 rounded-xl shadow-lg shadow-[#1B5E20]/10">
+                          <Button size="icon" onClick={() => acceptNegotiation(n.id, n.crop_id)} className="bg-[#1B5E20] hover:bg-[#144917] h-10 w-10 rounded-xl shadow-lg shadow-[#1B5E20]/10">
                             <Check size={18} />
                           </Button>
                           <Button size="icon" onClick={() => rejectNegotiation(n.id)} variant="ghost" className="bg-red-50 text-red-500 hover:bg-red-100 h-10 w-10 rounded-xl">

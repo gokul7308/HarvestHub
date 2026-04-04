@@ -20,11 +20,11 @@ export default function DashboardLayout() {
   }
 
   const navItems = [
-    { label: t("nav.dashboard"), href: `/${user.role}`, icon: LayoutDashboard },
+    { label: t("nav.dashboard"), href: `/${user.role}-dashboard`, icon: LayoutDashboard },
     { label: t("nav.marketplace"), href: "/marketplace", icon: Store },
     { label: t("nav.analytics"), href: "/analytics", icon: LineChart },
-    { label: user.role === 'merchant' ? "Active Orders" : "Listings", href: user.role === 'merchant' ? "/merchant/orders" : "/listings", icon: List },
-    ...(user.role === 'merchant' ? [{ label: "My Demands", href: "/merchant/demands", icon: Target }] : []),
+    { label: user.role === 'merchant' ? "Active Orders" : "Listings", href: user.role === 'merchant' ? "/merchant-dashboard/orders" : "/listings", icon: List },
+    ...(user.role === 'merchant' ? [{ label: "My Demands", href: "/merchant-dashboard/demands", icon: Target }] : []),
     { label: t("nav.settings"), href: "/settings", icon: Settings },
   ]
 

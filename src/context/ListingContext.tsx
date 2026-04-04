@@ -41,6 +41,7 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
       if (cropsData) {
         setListings(cropsData.map(l => ({
           ...l,
+          name: l.crop_name, // Map for frontend compat
           offers: (l.offers || []).map((o: any) => ({
             ...o,
             status: o.status as OfferStatus
@@ -54,7 +55,7 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addListing = async (listing: Omit<Listing, 'id' | 'createdAt' | 'offers' | 'status'>) => {
+  const addListing = async (listing: any) => {
     if (!user) {
       toast.error("You must be logged in to add a listing");
       return;
@@ -64,7 +65,10 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase
         .from('crops')
         .insert([{
-          ...listing,
+          crop_name: listing.name,
+          price: listing.price,
+          quantity: listing.quantity,
+          location: listing.location,
           farmer_id: user.id,
           status: 'Active'
         }])

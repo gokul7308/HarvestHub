@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sprout, Briefcase, ShieldCheck, Mail, Lock, LogIn, UserPlus, Globe, Check, Loader2, ArrowRight, ChevronDown, TrendingUp, CloudRain } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -15,7 +16,7 @@ export default function AuthPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
-  const { login, signup } = useUser()
+  const { login, signup, signInWithGoogle, resetPassword, setDemoUser } = useUser()
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
 
@@ -25,34 +26,55 @@ export default function AuthPage() {
     try {
       if (isLogin) {
         await login(email, password)
+        toast.success(`Welcome back! Let's get to work.`)
       } else {
         await signup(email, password, name, role)
-        alert("Verification email sent! Please check your inbox.")
+        toast.success("Verification email sent! Please check your inbox.")
         setIsLogin(true)
       }
-      // Redirection will happen automatically via UserContext/App protection if session is detected,
-      // but for immediate ux:
+      // Redirection logic
       if (isLogin) {
-         // Wait for profile fetch in context
-         setTimeout(() => navigate('/'), 500)
+         // The UserContext might take a moment to fetch profile, but we can try to predict or wait
+         setTimeout(() => navigate(`/${role}-dashboard`), 600)
       }
     } catch (error: any) {
-      alert(error.message || "Authentication failed")
+      toast.error(error.message || "Authentication failed")
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleDemoLogin = async (demoRole: 'farmer' | 'merchant' | 'admin') => {
-    // Demo login is now restricted to real accounts or I can keep a shortcut for devs
-    setEmail(`${demoRole}@harvest.com`)
-    setPassword('password123')
+    setIsLoading(true)
+    setDemoUser(demoRole)
+    setTimeout(() => {
+      navigate(`/${demoRole}-dashboard`)
+      setIsLoading(false)
+    }, 500)
+  }
+
+  const handleGoogleLogin = async () => {
     setIsLoading(true)
     try {
-      await login(`${demoRole}@harvest.com`, 'password123')
-      navigate(`/${demoRole}`)
-    } catch (error) {
-       alert("Demo account not found. Please sign up first.")
+      await signInWithGoogle(role)
+    } catch (error: any) {
+      toast.error(error.message || "Google login failed")
+      setIsLoading(false)
+    }
+  }
+
+  const handleForgotPassword = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!email) {
+      toast.error("Please enter your email address first.")
+      return
+    }
+    setIsLoading(true)
+    try {
+      await resetPassword(email)
+      toast.success("Password reset link sent to your email!")
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send reset link")
     } finally {
       setIsLoading(false)
     }
@@ -337,11 +359,11 @@ export default function AuthPage() {
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between ml-1">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t("auth.password")}</label>
-                    {isLogin && <a href="#" className="text-[10px] font-black text-[#1B5E20] uppercase tracking-widest hover:opacity-60 transition-opacity">{t("auth.forgotPassword")}</a>}
+                    {isLogin && <button onClick={handleForgotPassword} className="text-[10px] font-black text-[#1B5E20] uppercase tracking-widest hover:opacity-60 transition-opacity">{t("auth.forgotPassword")}</button>}
                   </div>
                   <div className="relative group">
-                    <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required className="pl-14 h-16 rounded-2xl bg-slate-50/50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-[#1B5E20]/5 focus:border-[#1B5E20] transition-all duration-300 border-2" />
-                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#1B5E20] transition-colors" size={20} />
+                     <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required={isLogin} className="pl-14 h-16 rounded-2xl bg-slate-50/50 border-slate-200 focus:bg-white focus:ring-4 focus:ring-[#1B5E20]/5 focus:border-[#1B5E20] transition-all duration-300 border-2" />
+                     <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#1B5E20] transition-colors" size={20} />
                   </div>
                 </div>
 
@@ -374,10 +396,18 @@ export default function AuthPage() {
                 <Button 
                   variant="outline" 
                   type="button"
-                  className="w-full h-16 rounded-2xl border-2 border-slate-100 bg-white hover:bg-slate-50/50 text-slate-700 font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-4 transition-all shadow-sm"
+                  disabled={isLoading}
+                  onClick={handleGoogleLogin}
+                  className="w-full h-16 rounded-2xl border-2 border-slate-100 bg-white hover:bg-slate-50/50 text-slate-700 font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-4 transition-all shadow-sm disabled:opacity-70"
                 >
-                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" alt="Google" />
-                  {t("auth.continueWithGoogle")}
+                  {isLoading ? (
+                    <Loader2 className="animate-spin text-[#1B5E20]" size={24} />
+                  ) : (
+                    <>
+                      <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" alt="Google" />
+                      {t("auth.continueWithGoogle")}
+                    </>
+                  )}
                 </Button>
 
                 {/* Quick Demo Access */}
