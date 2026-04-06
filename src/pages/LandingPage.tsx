@@ -167,34 +167,79 @@ export default function LandingPage() {
                   </div>
                 </div>
                 {/* Mock UI Body */}
-                <div className="flex gap-4 mb-4">
-                  <div className="flex-1 bg-gradient-to-br from-[#1B5E20] to-[#2E7D32] rounded-2xl p-4 shadow-lg text-white">
+                <div className="flex gap-4 mb-6">
+                  <div className="flex-1 bg-gradient-to-br from-[#1B5E20] to-[#2E7D32] rounded-2xl p-4 shadow-lg text-white group/card hover:scale-[1.02] transition-transform">
                     <div className="w-8 h-8 rounded-full bg-white/20 mb-4 flex items-center justify-center">
                       <TrendingUp size={16} />
                     </div>
-                    <div className="text-sm font-medium opacity-80 mb-1">{t("landing.liveProfit")}</div>
-                    <div className="text-2xl font-bold">$12,450.00</div>
+                    <div className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">{t("landing.liveProfit")}</div>
+                    <div className="text-2xl font-black font-poppins">$12,450.00</div>
                   </div>
-                  <div className="flex-1 bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                  <div className="flex-1 bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all">
                     <div className="w-8 h-8 rounded-full bg-[#00E676]/20 text-[#1B5E20] mb-4 flex items-center justify-center">
                       <CloudRain size={16} />
                     </div>
-                    <div className="text-sm font-medium text-slate-500 mb-1">{t("dashboard.localWeather")}</div>
-                    <div className="text-xl font-bold text-slate-800">72°F <span className="text-sm font-normal text-slate-400">{t("landing.rainy")}</span></div>
+                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{t("dashboard.localWeather")}</div>
+                    <div className="text-xl font-black text-slate-800 font-poppins">72°F <span className="text-xs font-bold text-slate-400 uppercase ml-1">{t("landing.rainy")}</span></div>
                   </div>
                 </div>
+
+                {/* Market Trends Mini-Graph */}
+                <div className="mb-6 px-2">
+                   <div className="flex items-center justify-between mb-3">
+                      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Market Index</span>
+                      <span className="text-[9px] font-black text-[#00E676] bg-[#00E676]/10 px-2 py-0.5 rounded-full">+4.2%</span>
+                   </div>
+                   <div className="flex items-end gap-1.5 h-12">
+                      {[30, 45, 35, 60, 50, 75, 40, 85, 70, 95].map((h, i) => (
+                        <motion.div 
+                          key={i}
+                          initial={{ height: 0 }}
+                          animate={{ height: `${h}%` }}
+                          transition={{ delay: i * 0.05 + 0.5, duration: 0.8 }}
+                          className="flex-1 bg-slate-100 rounded-t-sm group-hover:bg-[#1B5E20]/20 transition-colors"
+                        />
+                      ))}
+                   </div>
+                </div>
+
+                {/* Recent Activity Mini-Feed */}
+                <div className="space-y-3 mb-6">
+                   <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Recent Activity</span>
+                   </div>
+                   {[
+                     { icon: ShoppingCart, text: "New offer for Organic Wheat", time: "2m", color: "text-blue-500", bg: "bg-blue-50" },
+                     { icon: Activity, text: "Price forecast updated", time: "15m", color: "text-[#1B5E20]", bg: "bg-[#F0FDF4]" }
+                   ].map((item, i) => (
+                     <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/50 border border-slate-100/50">
+                        <div className="flex items-center gap-3">
+                           <div className={`p-1.5 rounded-lg ${item.bg} ${item.color}`}>
+                              <item.icon size={12} />
+                           </div>
+                           <span className="text-[10px] font-bold text-slate-700">{item.text}</span>
+                        </div>
+                        <span className="text-[9px] font-bold text-slate-400">{item.time}</span>
+                     </div>
+                   ))}
+                </div>
+
                 {/* AI Demand Mock */}
-                <div className="flex-1 bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mt-auto relative overflow-hidden">
-                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#00E676]/10 rounded-full blur-xl"></div>
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mt-auto relative overflow-hidden group/ai">
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#00E676]/10 rounded-full blur-xl group-hover/ai:scale-150 transition-transform duration-700"></div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Bot size={16} className="text-[#1B5E20]" />
-                    <span className="text-sm font-semibold text-slate-700">{t("landing.aiMarketInsight")}</span>
+                    <div className="p-1.5 bg-[#1B5E20] rounded-lg text-white shadow-lg shadow-[#1B5E20]/20">
+                      <Bot size={14} />
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-700">{t("landing.aiMarketInsight")}</span>
                   </div>
-                  <div className="space-y-3 relative z-10 text-sm">
-                    <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="space-y-4 relative z-10 text-xs text-slate-600">
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 group-hover/ai:border-[#00E676]/30 transition-colors font-medium leading-relaxed">
                        {t("landing.wheatDemandSurge")}
                     </div>
-                    <Button className="w-full text-xs h-8 bg-black hover:bg-gray-800 text-white rounded-lg">{t("landing.applyStrategy")}</Button>
+                    <Button className="w-full text-[10px] font-black uppercase tracking-[0.2em] h-10 bg-slate-900 hover:bg-black text-white rounded-xl shadow-xl shadow-slate-200 transition-all hover:-translate-y-0.5 active:translate-y-0">
+                      {t("landing.applyStrategy")}
+                    </Button>
                   </div>
                 </div>
               </div>
