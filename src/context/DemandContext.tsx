@@ -66,6 +66,13 @@ export function DemandProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    if (user.id.startsWith('demo-')) {
+      const newDemand = { ...demand, id: Math.random().toString(), merchant_id: user.id, status: 'open', created_at: new Date().toISOString(), profiles: { name: user.name } } as Demand;
+      setDemands([newDemand, ...demands]);
+      toast.success("Demand posted successfully! (Demo Mode)");
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('demands')

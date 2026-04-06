@@ -61,6 +61,14 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Handle Demo Account UI testing independently of Supabase
+    if (user.id.startsWith('demo-')) {
+      const newListing = { ...listing, id: Math.random().toString(), farmer_id: user.id, status: 'Active', offers: [], created_at: new Date().toISOString() } as Listing;
+      setListings([newListing, ...listings]);
+      toast.success("Crop Listing Added Successfully! (Demo Mode)");
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('crops')
@@ -69,15 +77,14 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
           price: listing.price,
           quantity: listing.quantity,
           location: listing.location,
-          farmer_id: user.id,
-          status: 'Active'
+          farmer_id: user.id
         }])
         .select()
         .single();
 
       if (error) throw error;
 
-      const newListing = { ...data, offers: [] } as Listing;
+      const newListing = { ...data, name: data.crop_name, status: 'Active', offers: [] } as Listing;
       setListings([newListing, ...listings]);
       toast.success("Crop Listing Added Successfully!");
     } catch (error) {
@@ -87,6 +94,12 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateListing = async (id: string, updates: Partial<Listing>) => {
+    if (user?.id.startsWith('demo-')) {
+      setListings(listings.map(l => l.id === id ? { ...l, ...updates } : l));
+      toast.success("Listing Updated (Demo Mode)");
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('crops')
@@ -104,6 +117,12 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteListing = async (id: string) => {
+    if (user?.id.startsWith('demo-')) {
+      setListings(listings.filter(l => l.id !== id));
+      toast.success("Listing Deleted (Demo Mode)");
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('crops')
