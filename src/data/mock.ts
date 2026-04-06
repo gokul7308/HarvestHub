@@ -25,7 +25,7 @@ export const users: Record<string, User> = {
     id: "a1",
     name: "System Admin",
     role: "admin",
-    email: "admin@cropdeck.com",
+    email: "admin@harvesthub.com",
     avatar: "https://i.pravatar.cc/150?u=a1",
   }
 }

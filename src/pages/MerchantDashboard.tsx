@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useUser } from "@/context/UserContext"
 import { useDemand } from "@/context/DemandContext"
 import { useNegotiations } from "@/context/NegotiationContext"
+import { useOrders } from "@/context/OrderContext"
 import { useNavigate } from "react-router-dom"
 import { PostDemandModal } from "@/components/merchant/PostDemandModal"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -26,11 +27,13 @@ export default function MerchantDashboard() {
   const { user } = useUser()
   const { t } = useTranslation()
   const { negotiations } = useNegotiations()
+  const { orders } = useOrders()
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const myNegotiations = negotiations.filter(n => n.buyer_name === user?.name)
-  const pendingCount = myNegotiations.filter(n => n.status === 'Pending').length
+  const myNegotiations = negotiations.filter((n: any) => n.buyer_name === user?.name)
+  const pendingCount = myNegotiations.filter((n: any) => n.status === 'Pending').length
+  const activeOrdersCount = orders.filter((o: any) => o.status !== 'Delivered').length
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12 font-sans selection:bg-blue-600/10 selection:text-blue-600">
@@ -64,10 +67,10 @@ export default function MerchantDashboard() {
               <div className="p-3 bg-slate-50 text-slate-400 rounded-2xl group-hover:bg-[#F0FDF4] group-hover:text-[#1B5E20] transition-colors">
                 <ShoppingBag size={24} />
               </div>
-              <Badge className="bg-[#1B5E20] text-white border-0 font-black text-[9px] uppercase tracking-widest">2 {t("merchant.inTransit")}</Badge>
+              <Badge className="bg-[#1B5E20] text-white border-0 font-black text-[9px] uppercase tracking-widest">{activeOrdersCount} {t("merchant.inTransit")}</Badge>
             </div>
             <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">{t("merchant.activeOrders")}</h3>
-            <p className="text-4xl font-black mt-2 text-slate-900 font-poppins tracking-tighter">8</p>
+            <p className="text-4xl font-black mt-2 text-slate-900 font-poppins tracking-tighter">{activeOrdersCount}</p>
           </CardContent>
         </Card>
 

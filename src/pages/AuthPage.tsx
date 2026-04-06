@@ -29,7 +29,7 @@ export default function AuthPage() {
 
   const handleDemoLogin = async (demoRole: 'farmer' | 'merchant' | 'admin') => {
     setRole(demoRole)
-    setEmail(`${demoRole}@cropdeck.com`)
+    setEmail(`${demoRole}@harvesthub.com`)
     setPassword('123456')
     setIsLoading(true)
     // Simulate auto-fill delay
@@ -128,7 +128,7 @@ export default function AuthPage() {
               <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-3 rounded-2xl shadow-2xl flex items-center justify-center transition-all group-hover:bg-white group-hover:text-green-800 text-white">
                 <Sprout size={32} className="transition-transform group-hover:rotate-12" />
               </div>
-              <span className="text-3xl font-black font-poppins tracking-tighter text-white drop-shadow-md">CROPDECK</span>
+              <span className="text-3xl font-black font-poppins tracking-tighter text-white drop-shadow-md">HARVESTHUB</span>
             </Link>
             
             <h1 className="text-5xl font-black font-poppins text-white mb-6 leading-tight tracking-tight drop-shadow-2xl">
@@ -238,7 +238,7 @@ export default function AuthPage() {
             <div className="bg-white p-2 rounded-xl shadow-lg border border-slate-100">
                <Sprout size={28} className="text-[#1B5E20]" />
             </div>
-            <span className="text-3xl font-black font-poppins tracking-tighter text-[#1B5E20]">CROPDECK</span>
+            <span className="text-3xl font-black font-poppins tracking-tighter text-[#1B5E20]">HARVESTHUB</span>
           </Link>
         </div>
 

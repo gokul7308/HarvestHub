@@ -35,7 +35,7 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode,
       <div className="h-screen w-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-[#1B5E20]/20 border-t-[#1B5E20] rounded-full animate-spin"></div>
-          <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Initializing HarvesttHub...</p>
+          <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Initializing HarvestHub...</p>
         </div>
       </div>
     )

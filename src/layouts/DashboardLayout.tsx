@@ -41,7 +41,7 @@ export default function DashboardLayout() {
               <Store size={24} />
             </div>
             <div className="flex flex-col -gap-1">
-               <span className="text-2xl font-black font-poppins tracking-tighter text-[#1B5E20] dark:text-[#00E676]">CROPDECK</span>
+               <span className="text-2xl font-black font-poppins tracking-tighter text-[#1B5E20] dark:text-[#00E676]">HARVESTHUB</span>
                <span className="text-[8px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-slate-500 mt-0.5">Agriculture v1.0</span>
             </div>
           </Link>

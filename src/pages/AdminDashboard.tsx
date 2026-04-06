@@ -32,7 +32,7 @@ export default function AdminDashboard() {
     const csvContent = "data:text/csv;charset=utf-8," + data.map(e => `${e.name},${e.value}`).join("\n");
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", "cropdeck_report.csv");
+    link.setAttribute("download", "harvesthub_report.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
