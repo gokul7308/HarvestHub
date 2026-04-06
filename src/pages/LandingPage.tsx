@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { 
   ArrowRight, Sprout, TrendingUp, CloudRain, 
   Store, ShieldCheck, CheckCircle2,
-  Users, Bot, ShoppingCart, Activity, Globe, Check, ChevronDown
+  Users, Bot, ShoppingCart, Activity, Globe, Check, ChevronDown,
+  Handshake, Zap
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
@@ -152,6 +153,23 @@ export default function LandingPage() {
               {/* Premium Dashboard Mockup Float */}
               <div className="absolute inset-0 bg-gradient-to-tr from-[#1B5E20]/20 to-[#00E676]/20 rounded-3xl transform rotate-3 scale-105 blur-lg mix-blend-multiply opacity-50"></div>
               <div className="relative w-full h-full bg-white/40 backdrop-blur-xl border border-white/60 rounded-[32px] shadow-2xl overflow-hidden p-6 ring-1 ring-black/5 flex flex-col">
+                
+                {/* Merchant Matching Toast (Floating animation) */}
+                <motion.div 
+                   initial={{ opacity: 0, x: 20, scale: 0.9 }}
+                   animate={{ opacity: [0, 1, 1, 0], x: [20, 0, 0, 20], scale: [0.9, 1, 1, 0.9] }}
+                   transition={{ delay: 3, duration: 4, repeat: Infinity, repeatDelay: 10 }}
+                   className="absolute top-24 right-8 z-50 bg-white shadow-2xl rounded-2xl border border-blue-50 p-4 flex items-center gap-4 shadow-blue-500/10 ring-1 ring-black/5"
+                >
+                   <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-200">
+                      <Check size={18} />
+                   </div>
+                   <div className="pr-4">
+                      <div className="text-[10px] font-black uppercase tracking-widest text-blue-500 leading-none mb-1.5">Live Match</div>
+                      <div className="text-[11px] font-black text-slate-800 leading-none tracking-tight">Order #9421 Confirmed</div>
+                   </div>
+                </motion.div>
+
                 {/* Mock UI Header */}
                 <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
                   <div className="flex items-center gap-3">
@@ -166,78 +184,95 @@ export default function LandingPage() {
                     <div className="w-8 h-8 rounded-full bg-gray-100"></div>
                   </div>
                 </div>
+
                 {/* Mock UI Body */}
                 <div className="flex gap-4 mb-6">
-                  <div className="flex-1 bg-gradient-to-br from-[#1B5E20] to-[#2E7D32] rounded-2xl p-4 shadow-lg text-white group/card hover:scale-[1.02] transition-transform">
-                    <div className="w-8 h-8 rounded-full bg-white/20 mb-4 flex items-center justify-center">
-                      <TrendingUp size={16} />
+                  <div className="flex-1 bg-gradient-to-br from-[#1B5E20] to-[#2E7D32] rounded-[24px] p-5 shadow-xl text-white group/card hover:scale-[1.02] transition-transform relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                    <div className="w-9 h-9 rounded-xl bg-white/20 mb-5 flex items-center justify-center backdrop-blur-sm">
+                      <TrendingUp size={20} />
                     </div>
-                    <div className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">{t("landing.liveProfit")}</div>
-                    <div className="text-2xl font-black font-poppins">$12,450.00</div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70 mb-1">{t("landing.liveProfit")}</div>
+                    <div className="text-3xl font-black font-poppins">$14,820.50</div>
                   </div>
-                  <div className="flex-1 bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                    <div className="w-8 h-8 rounded-full bg-[#00E676]/20 text-[#1B5E20] mb-4 flex items-center justify-center">
-                      <CloudRain size={16} />
+                  <div className="flex-1 bg-white rounded-[24px] p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                    <div className="w-9 h-9 rounded-xl bg-[#00E676]/10 text-[#1B5E20] mb-5 flex items-center justify-center">
+                      <CloudRain size={20} />
                     </div>
-                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{t("dashboard.localWeather")}</div>
-                    <div className="text-xl font-black text-slate-800 font-poppins">72°F <span className="text-xs font-bold text-slate-400 uppercase ml-1">{t("landing.rainy")}</span></div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{t("dashboard.localWeather")}</div>
+                    <div className="text-2xl font-black text-slate-800 font-poppins tracking-tighter">74°F <span className="text-xs font-bold text-slate-300 uppercase ml-1">{t("landing.rainy")}</span></div>
                   </div>
                 </div>
 
-                {/* Market Trends Mini-Graph */}
-                <div className="mb-6 px-2">
-                   <div className="flex items-center justify-between mb-3">
-                      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Market Index</span>
-                      <span className="text-[9px] font-black text-[#00E676] bg-[#00E676]/10 px-2 py-0.5 rounded-full">+4.2%</span>
+                {/* Market Price Predictions (Enhanced UI) */}
+                <div className="mb-8 px-2">
+                   <div className="flex items-center justify-between mb-4 px-1">
+                      <div className="flex items-center gap-2.5">
+                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                         <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Market Price Index</span>
+                      </div>
+                      <span className="text-[9px] font-black text-[#00E676] bg-[#00E676]/10 px-2.5 py-1 rounded-full border border-[#00E676]/20">+18.5% Predicted</span>
                    </div>
-                   <div className="flex items-end gap-1.5 h-12">
-                      {[30, 45, 35, 60, 50, 75, 40, 85, 70, 95].map((h, i) => (
+                   <div className="flex items-end gap-[3px] h-16 bg-slate-50/50 rounded-2xl p-3 items-baseline border border-slate-100/50">
+                      {[25, 45, 30, 55, 40, 75, 60, 95, 80, 100, 90, 110, 105, 120].map((h, i) => (
                         <motion.div 
                           key={i}
                           initial={{ height: 0 }}
                           animate={{ height: `${h}%` }}
-                          transition={{ delay: i * 0.05 + 0.5, duration: 0.8 }}
-                          className="flex-1 bg-slate-100 rounded-t-sm group-hover:bg-[#1B5E20]/20 transition-colors"
+                          transition={{ delay: i * 0.03 + 0.5, duration: 0.5 }}
+                          className={`flex-1 rounded-t-[2px] transition-all cursor-pointer ${i > 11 ? 'bg-blue-600 shadow-[0_0_12px_rgba(37,99,235,0.4)]' : 'bg-slate-200 hover:bg-slate-300'}`}
                         />
                       ))}
                    </div>
                 </div>
 
-                {/* Recent Activity Mini-Feed */}
-                <div className="space-y-3 mb-6">
-                   <div className="flex items-center justify-between mb-1">
-                      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Recent Activity</span>
+                {/* Recent Trading Activity Feed */}
+                <div className="space-y-3 mb-8">
+                   <div className="flex items-center justify-between mb-2 px-1">
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Live Trade Feed</span>
                    </div>
                    {[
-                     { icon: ShoppingCart, text: "New offer for Organic Wheat", time: "2m", color: "text-blue-500", bg: "bg-blue-50" },
-                     { icon: Activity, text: "Price forecast updated", time: "15m", color: "text-[#1B5E20]", bg: "bg-[#F0FDF4]" }
+                     { icon: ShoppingCart, text: "Bid received: 50T Wheat", time: "Just now", color: "text-blue-600", bg: "bg-blue-50" },
+                     { icon: Handshake, text: "Smart escrow finalized", time: "12m ago", color: "text-[#1B5E20]", bg: "bg-[#F0FDF4]" }
                    ].map((item, i) => (
-                     <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/50 border border-slate-100/50">
+                     <motion.div 
+                        key={i} 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.2 + 1 }}
+                        className="flex items-center justify-between p-3 rounded-[20px] bg-white border border-slate-100 hover:border-slate-200 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.02)]"
+                     >
                         <div className="flex items-center gap-3">
-                           <div className={`p-1.5 rounded-lg ${item.bg} ${item.color}`}>
-                              <item.icon size={12} />
+                           <div className={`p-2.5 rounded-xl ${item.bg} ${item.color} shadow-sm`}>
+                              <item.icon size={14} />
                            </div>
-                           <span className="text-[10px] font-bold text-slate-700">{item.text}</span>
+                           <span className="text-[11px] font-black text-slate-700 tracking-tight">{item.text}</span>
                         </div>
-                        <span className="text-[9px] font-bold text-slate-400">{item.time}</span>
-                     </div>
+                        <span className="text-[9px] font-black text-slate-300 uppercase tracking-tighter tabular-nums">{item.time}</span>
+                     </motion.div>
                    ))}
                 </div>
 
-                {/* AI Demand Mock */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mt-auto relative overflow-hidden group/ai">
-                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#00E676]/10 rounded-full blur-xl group-hover/ai:scale-150 transition-transform duration-700"></div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="p-1.5 bg-[#1B5E20] rounded-lg text-white shadow-lg shadow-[#1B5E20]/20">
-                      <Bot size={14} />
+                {/* AI Insight Card (Premium Redesign) */}
+                <div className="bg-white rounded-[32px] p-6 border border-slate-100 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] mt-auto relative overflow-hidden group/ai ring-1 ring-black/5">
+                  <div className="absolute -right-8 -top-8 w-40 h-40 bg-[#00E676]/10 rounded-full blur-[40px] group-hover/ai:scale-125 transition-transform duration-1000"></div>
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="p-2.5 bg-[#1B5E20] rounded-[14px] text-white shadow-xl shadow-[#1B5E20]/20 flex items-center justify-center transform group-hover/ai:rotate-12 transition-transform">
+                      <Bot size={18} />
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-700">{t("landing.aiMarketInsight")}</span>
+                    <div className="flex flex-col">
+                       <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[#1B5E20] leading-none mb-1.5">HarvestHub AI</span>
+                       <div className="flex items-center gap-1.5">
+                          <div className="w-1 h-1 rounded-full bg-[#00E676]"></div>
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em]">Verified Intelligence</span>
+                       </div>
+                    </div>
                   </div>
-                  <div className="space-y-4 relative z-10 text-xs text-slate-600">
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 group-hover/ai:border-[#00E676]/30 transition-colors font-medium leading-relaxed">
+                  <div className="space-y-5 relative z-10">
+                    <div className="p-4 rounded-2xl bg-[#F0FDF4] border border-[#1B5E20]/5 group-hover/ai:border-[#00E676]/30 transition-colors text-xs font-bold leading-relaxed text-slate-800 shadow-sm">
                        {t("landing.wheatDemandSurge")}
                     </div>
-                    <Button className="w-full text-[10px] font-black uppercase tracking-[0.2em] h-10 bg-slate-900 hover:bg-black text-white rounded-xl shadow-xl shadow-slate-200 transition-all hover:-translate-y-0.5 active:translate-y-0">
+                    <Button className="w-full text-[11px] font-black uppercase tracking-[0.25em] h-12 bg-slate-900 hover:bg-black text-white rounded-[18px] shadow-2xl shadow-slate-200 transition-all hover:-translate-y-1 active:scale-[0.98]">
                       {t("landing.applyStrategy")}
                     </Button>
                   </div>
