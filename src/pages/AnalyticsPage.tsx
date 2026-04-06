@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts'
 import { Download, CalendarDays, TrendingUp, TrendingDown, Target } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 
 const fullYearData = [
   { name: 'Jan', wheat: 400, corn: 240, soy: 240 },
@@ -60,6 +61,31 @@ export default function AnalyticsPage() {
      return [`${formatCurrencyRaw(value)} per kg`, name.charAt(0).toUpperCase() + name.slice(1)]
   }
 
+  const handleExportCSV = () => {
+    const headers = ['Month', 'Wheat Price', 'Corn Price', 'Soy Price'];
+    const rows = filteredData.map(row => [
+      row.name,
+      row.wheat.toString(),
+      row.corn.toString(),
+      row.soy.toString()
+    ]);
+    
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `harvesthub_analytics_${range}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success('Analytics data exported successfully!');
+  }
+
   const kpis = [
     { title: t("analytics.avgWheatPrice") + " (per kg)", current: formatPrice(450), prior: formatPrice(420), rawCurrent: 450, rawPrior: 420, trend: "up" },
     { title: t("analytics.avgCornPrice") + " (per kg)", current: formatPrice(310), prior: formatPrice(325), rawCurrent: 310, rawPrior: 325, trend: "down" },
@@ -92,7 +118,10 @@ export default function AnalyticsPage() {
             <option value="6m">Last 6 Months</option>
             <option value="1y">1 Year</option>
           </select>
-          <Button className="h-14 bg-[#1B5E20] hover:bg-[#144917] rounded-2xl shadow-xl shadow-[#1B5E20]/20 text-white font-black text-[10px] uppercase tracking-widest px-8 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+          <Button 
+            onClick={handleExportCSV}
+            className="h-14 bg-[#1B5E20] hover:bg-[#144917] rounded-2xl shadow-xl shadow-[#1B5E20]/20 text-white font-black text-[10px] uppercase tracking-widest px-8 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+          >
             <Download size={16} /> {t("analytics.exportCsv")}
           </Button>
         </div>
