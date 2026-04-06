@@ -57,10 +57,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   const login = async (role: 'farmer' | 'merchant' | 'admin') => {
-    // For demo purposes, we still use mock users if not logged into real supabase
-    // But in a real app, this would use supabase.auth.signInWithPassword()
-    const mockUser = users[role]
-    setUser(mockUser)
+    const demoUsers = {
+      farmer: { id: 'demo-farmer', email: 'farmer@demo.com', name: 'Demo Farmer', role: 'farmer' as const, avatar: 'DF' },
+      merchant: { id: 'demo-merchant', email: 'merchant@demo.com', name: 'Demo Merchant', role: 'merchant' as const, avatar: 'DM' },
+      admin: { id: 'demo-admin', email: 'admin@demo.com', name: 'Demo Admin', role: 'admin' as const, avatar: 'DA' }
+    };
+    setUser(demoUsers[role]);
     setLoading(false)
   }
 
