@@ -83,20 +83,7 @@ export function AppearanceSettings() {
         </div>
       </SettingSection>
 
-      <SettingSection title={t("settings.uiPreview")} description={t("settings.realTimePreview")}>
-        <div className="p-6 bg-slate-50 rounded-2xl border border-gray-100">
-           <div className="p-4 bg-white shadow-sm border border-gray-100 rounded-xl max-w-sm">
-             <div className="flex items-center gap-3 mb-4">
-               <div className="w-10 h-10 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white"><MousePointer2 size={18} /></div>
-               <div>
-                  <div className="h-2 w-24 bg-slate-200 rounded-full mb-1"></div>
-                  <div className="h-2 w-16 bg-slate-100 rounded-full"></div>
-               </div>
-             </div>
-             <Button className="w-full bg-[var(--color-primary)] text-white hover:brightness-110">{t("settings.sampleButton")}</Button>
-           </div>
-        </div>
-      </SettingSection>
+
     </motion.div>
   );
 }
