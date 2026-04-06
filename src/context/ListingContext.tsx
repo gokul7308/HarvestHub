@@ -17,14 +17,48 @@ interface ListingContextType {
 
 const ListingContext = createContext<ListingContextType | undefined>(undefined);
 
+const defaultMockListings: any[] = [
+  {
+    id: "LIST-992A",
+    name: "Organic Premium Wheat",
+    price: 0.45,
+    quantity: 1000,
+    unit: "kg",
+    location: "California, USA",
+    farmerId: "demo-farmer",
+    status: "Active",
+    offers: [],
+    images: ["https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&q=80&w=600"],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "LIST-881B",
+    name: "Golden Soybeans",
+    price: 0.35,
+    quantity: 5000,
+    unit: "kg",
+    location: "Iowa, USA",
+    farmerId: "demo-farmer",
+    status: "Active",
+    offers: [],
+    images: ["https://images.unsplash.com/photo-1599839619722-39751411ea63?auto=format&fit=crop&q=80&w=600"],
+    createdAt: new Date().toISOString()
+  }
+];
+
 export function ListingProvider({ children }: { children: React.ReactNode }) {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
 
   useEffect(() => {
-    fetchListings();
-  }, []);
+    if (user?.id.startsWith('demo-')) {
+      setListings(defaultMockListings);
+      setLoading(false);
+    } else {
+      fetchListings();
+    }
+  }, [user]);
 
   const fetchListings = async () => {
     try {
@@ -63,10 +97,14 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
 
     // Handle Demo Account UI testing independently of Supabase
     if (user.id.startsWith('demo-')) {
-      const newListing = { ...listing, id: Math.random().toString(), farmer_id: user.id, status: 'Active', offers: [], created_at: new Date().toISOString() } as Listing;
-      setListings([newListing, ...listings]);
-      toast.success("Crop Listing Added Successfully! (Demo Mode)");
-      return;
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          const newListing = { ...listing, id: Math.random().toString(), farmer_id: user.id, status: 'Active', offers: [], created_at: new Date().toISOString() } as Listing;
+          setListings(prev => [newListing, ...prev]);
+          toast.success("Crop Listing Added Successfully! (Demo Mode)");
+          resolve();
+        }, 500);
+      });
     }
 
     try {
