@@ -1,0 +1,217 @@
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Listing } from '../types/listing';
+import { Offer, OfferStatus } from '../types/offer';
+import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
+import { useUser } from './UserContext';
+
+interface ListingContextType {
+  listings: Listing[];
+  loading: boolean;
+  addListing: (listing: Omit<Listing, 'id' | 'createdAt' | 'offers' | 'status'>) => Promise<void>;
+  updateListing: (id: string, updates: Partial<Listing>) => Promise<void>;
+  deleteListing: (id: string) => Promise<void>;
+  getOffersByListing: (listingId: string) => Offer[];
+  updateOfferStatus: (listingId: string, offerId: string, status: OfferStatus) => Promise<void>;
+}
+
+const ListingContext = createContext<ListingContextType | undefined>(undefined);
+
+const defaultMockListings: any[] = [
+  {
+    id: "LIST-992A",
+    name: "Organic Premium Wheat",
+    price: 0.45,
+    quantity: 1000,
+    unit: "kg",
+    location: "California, USA",
+    farmerId: "demo-farmer",
+    status: "Active",
+    offers: [],
+    images: ["https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&q=80&w=600"],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "LIST-881B",
+    name: "Golden Soybeans",
+    price: 0.35,
+    quantity: 5000,
+    unit: "kg",
+    location: "Iowa, USA",
+    farmerId: "demo-farmer",
+    status: "Active",
+    offers: [],
+    images: ["https://images.unsplash.com/photo-1599839619722-39751411ea63?auto=format&fit=crop&q=80&w=600"],
+    createdAt: new Date().toISOString()
+  }
+];
+
+export function ListingProvider({ children }: { children: React.ReactNode }) {
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user?.id.startsWith('demo-')) {
+      setListings(defaultMockListings);
+      setLoading(false);
+    } else {
+      fetchListings();
+    }
+  }, [user]);
+
+  const fetchListings = async () => {
+    try {
+      const { data: listingsData, error: listingsError } = await supabase
+        .from('listings')
+        .select(`
+          *,
+          offers (*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (listingsError) throw listingsError;
+      
+      if (listingsData) {
+        setListings(listingsData.map(l => ({
+          ...l,
+          offers: l.offers.map((o: any) => ({
+            ...o,
+            status: o.status as OfferStatus
+          }))
+        })));
+      }
+    } catch (error) {
+      console.error('Error fetching listings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addListing = async (listing: any) => {
+    if (!user) {
+      toast.error("You must be logged in to add a listing");
+      return;
+    }
+
+    if (user.id.startsWith('demo-')) {
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          const newListing = { ...listing, id: Math.random().toString(), farmer_id: user.id, status: 'Active', offers: [], created_at: new Date().toISOString() } as Listing;
+          setListings(prev => [newListing, ...prev]);
+          toast.success("Crop Listing Added Successfully! (Demo Mode)");
+          resolve();
+        }, 500);
+      });
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('listings')
+        .insert([{
+          ...listing,
+          farmer_id: user.id,
+          status: 'Active'
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const newListing = { ...data, offers: [] } as Listing;
+      setListings([newListing, ...listings]);
+      toast.success("Crop Listing Added Successfully!");
+    } catch (error) {
+      console.error('Error adding listing:', error);
+      toast.error("Failed to add listing");
+    }
+  };
+
+  const updateListing = async (id: string, updates: Partial<Listing>) => {
+    if (user?.id.startsWith('demo-')) {
+       setListings(listings.map(l => l.id === id ? { ...l, ...updates } : l));
+       toast.success("Listing Updated (Demo Mode)");
+       return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('listings')
+        .update(updates)
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setListings(listings.map(l => l.id === id ? { ...l, ...updates } : l));
+      toast.success("Listing Updated");
+    } catch (error) {
+      console.error('Error updating listing:', error);
+      toast.error("Failed to update listing");
+    }
+  };
+
+  const deleteListing = async (id: string) => {
+    if (user?.id.startsWith('demo-')) {
+       setListings(listings.filter(l => l.id !== id));
+       toast.success("Listing Deleted (Demo Mode)");
+       return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('listings')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setListings(listings.filter(l => l.id !== id));
+      toast.success("Listing Deleted");
+    } catch (error) {
+      console.error('Error deleting listing:', error);
+      toast.error("Failed to delete listing");
+    }
+  };
+
+  const getOffersByListing = (listingId: string) => {
+    return listings.find(l => l.id === listingId)?.offers || [];
+  };
+
+  const updateOfferStatus = async (listingId: string, offerId: string, status: OfferStatus) => {
+    try {
+      const { error } = await supabase
+        .from('offers')
+        .update({ status })
+        .eq('id', offerId);
+
+      if (error) throw error;
+
+      const newListings = listings.map(l => {
+        if (l.id !== listingId) return l;
+        return {
+          ...l,
+          offers: l.offers.map(o => o.id === offerId ? { ...o, status } : o)
+        };
+      });
+      setListings(newListings);
+      
+      if (status === 'Accepted') toast.success("Offer Accepted!");
+      if (status === 'Rejected') toast.info("Offer Rejected");
+    } catch (error) {
+      console.error('Error updating offer status:', error);
+      toast.error("Failed to update offer");
+    }
+  };
+
+  return (
+    <ListingContext.Provider value={{ listings, loading, addListing, updateListing, deleteListing, getOffersByListing, updateOfferStatus }}>
+      {children}
+    </ListingContext.Provider>
+  );
+}
+
+export function useListings() {
+  const ctx = useContext(ListingContext);
+  if (!ctx) throw new Error("useListings must be used within ListingProvider");
+  return ctx;
+}
