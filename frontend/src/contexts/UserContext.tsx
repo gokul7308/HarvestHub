@@ -8,6 +8,8 @@ interface UserContextType {
   login: (role: 'farmer' | 'merchant' | 'admin') => Promise<void>
   logout: () => Promise<void>
   updateUser: (profile: Partial<User>) => Promise<void>
+  sendOtp: (email: string) => Promise<void>
+  verifyOtp: (email: string, token: string, name?: string, role?: string) => Promise<void>
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
@@ -20,7 +22,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        fetchProfile(session.user.id)
+        fetchProfile(session.user.id, session.user)
       } else {
         setLoading(false)
       }
@@ -29,7 +31,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        fetchProfile(session.user.id)
+        fetchProfile(session.user.id, session.user)
       } else {
         setUser(null)
         setLoading(false)
@@ -39,7 +41,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, authUser?: any) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -47,8 +49,30 @@ export function UserProvider({ children }: { children: ReactNode }) {
         .eq('id', userId)
         .single()
 
-      if (error) throw error
-      if (data) setUser(data as User)
+      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is no rows returned
+
+      if (data) {
+        setUser(data as User)
+      } else if (authUser) {
+        // Create actual profile for new Google OAuth users
+        const newProfile = {
+          id: authUser.id,
+          name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
+          email: authUser.email || '',
+          role: 'farmer', // default role
+          avatar: 'U'
+        };
+        
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert([newProfile]);
+          
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          // Fallback to setting user so they don't get stuck in a redirect loop
+        }
+        setUser(newProfile as User);
+      }
     } catch (error) {
       console.error('Error fetching profile:', error)
     } finally {
@@ -71,6 +95,40 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUser(null)
   }
 
+  const sendOtp = async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({ email });
+    if (error) throw error;
+  }
+
+  const verifyOtp = async (email: string, token: string, name?: string, role?: string) => {
+    const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
+    if (error) throw error;
+    
+    // Check if profile exists, if not, create it
+    if (data?.session) {
+      const userId = data.session.user.id;
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (profileError && profileError.code === 'PGRST116') {
+        const newProfile = {
+          id: userId,
+          name: name || email.split('@')[0],
+          email: email,
+          role: role || 'farmer',
+          avatar: 'U'
+        };
+        await supabase.from('profiles').insert([newProfile]);
+        setUser(newProfile as User);
+      } else if (profileData) {
+        setUser(profileData as User);
+      }
+    }
+  }
+
   const updateUser = async (profile: Partial<User>) => {
     if (!user) return
 
@@ -89,7 +147,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <UserContext.Provider value={{ user, loading, login, logout, updateUser }}>
+    <UserContext.Provider value={{ user, loading, login, logout, updateUser, sendOtp, verifyOtp }}>
       {children}
     </UserContext.Provider>
   )

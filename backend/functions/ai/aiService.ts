@@ -1,8 +1,15 @@
 import { GoogleGenAI } from '@google/genai';
 
-// Initialize the client. This will throw if AI_API_KEY is missing.
-// It will automatically use the GEMINI_API_KEY environment variable.
-const ai = new GoogleGenAI({ apiKey: process.env.AI_API_KEY });
+let aiClient: GoogleGenAI | null = null;
+function getAiClient() {
+  if (!aiClient) {
+    if (!process.env.AI_API_KEY) {
+      throw new Error('AI service is currently unavailable. Please try again later.');
+    }
+    aiClient = new GoogleGenAI({ apiKey: process.env.AI_API_KEY });
+  }
+  return aiClient;
+}
 
 export async function predictCropPrice(data: any) {
   const prompt = `
@@ -21,18 +28,21 @@ export async function predictCropPrice(data: any) {
   `;
 
   try {
+    const ai = getAiClient();
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash',
       contents: prompt,
       config: {
         responseMimeType: "application/json",
       }
     });
 
-    return JSON.parse(response.text() || '{}');
+    const rawText = response.text || '{}';
+    const jsonText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+    return JSON.parse(jsonText);
   } catch (error) {
     console.error('AI Price Prediction Error:', error);
-    throw new Error('Failed to generate AI estimate.');
+    throw new Error('AI service is currently unavailable. Please try again later.');
   }
 }
 
@@ -52,18 +62,21 @@ export async function getMarketInsights(data: any) {
   `;
 
   try {
+    const ai = getAiClient();
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash',
       contents: prompt,
       config: {
         responseMimeType: "application/json",
       }
     });
 
-    return JSON.parse(response.text() || '{}');
+    const rawText = response.text || '{}';
+    const jsonText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+    return JSON.parse(jsonText);
   } catch (error) {
     console.error('AI Market Insights Error:', error);
-    throw new Error('Failed to generate market insights.');
+    throw new Error('AI service is currently unavailable. Please try again later.');
   }
 }
 
@@ -78,14 +91,15 @@ export async function askAssistant(query: string, contextData: any) {
   `;
 
   try {
+    const ai = getAiClient();
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash',
       contents: prompt,
     });
 
-    return { response: response.text() };
+    return { response: response.text };
   } catch (error) {
     console.error('AI Assistant Error:', error);
-    throw new Error('Failed to generate assistant response.');
+    throw new Error('AI service is currently unavailable. Please try again later.');
   }
 }

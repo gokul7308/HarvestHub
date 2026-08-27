@@ -26,7 +26,7 @@ export default function OTPLogin() {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [role, setRole] = useState<Role>('farmer')
-  const [otp, setOtp] = useState<string[]>(Array(8).fill(''))
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(''))
   const [loading, setLoading] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
   const [isNewUser, setIsNewUser] = useState(true)
@@ -35,7 +35,7 @@ export default function OTPLogin() {
 
   // If already logged in, redirect
   useEffect(() => {
-    if (user) navigate(`/${user.role}-dashboard`, { replace: true })
+    if (user) navigate(`/${user.role}`, { replace: true })
   }, [user, navigate])
 
   // Cooldown timer
@@ -75,9 +75,9 @@ export default function OTPLogin() {
     next[index] = value
     setOtp(next)
     // Auto-advance
-    if (value && index < 7) otpRefs.current[index + 1]?.focus()
+    if (value && index < 5) otpRefs.current[index + 1]?.focus()
     // Auto-submit when all filled
-    if (next.every(d => d) && next.join('').length === 8) {
+    if (next.every(d => d) && next.join('').length === 6) {
       handleVerifyOtp(next.join(''))
     }
   }
@@ -87,15 +87,15 @@ export default function OTPLogin() {
       otpRefs.current[index - 1]?.focus()
     }
     if (e.key === 'ArrowLeft' && index > 0) otpRefs.current[index - 1]?.focus()
-    if (e.key === 'ArrowRight' && index < 7) otpRefs.current[index + 1]?.focus()
+    if (e.key === 'ArrowRight' && index < 5) otpRefs.current[index + 1]?.focus()
   }
 
   const handleOtpPaste = (e: React.ClipboardEvent) => {
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 8)
-    if (pasted.length === 8) {
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
+    if (pasted.length === 6) {
       const next = pasted.split('')
       setOtp(next)
-      otpRefs.current[7]?.focus()
+      otpRefs.current[5]?.focus()
       handleVerifyOtp(pasted)
     }
   }
@@ -113,7 +113,7 @@ export default function OTPLogin() {
       } else {
         toast.error(err.message || 'Invalid OTP. Please try again.')
       }
-      setOtp(Array(8).fill(''))
+      setOtp(Array(6).fill(''))
       otpRefs.current[0]?.focus()
     } finally {
       setLoading(false)
@@ -122,7 +122,7 @@ export default function OTPLogin() {
 
   const handleVerifyClick = () => {
     const otpValue = otp.join('')
-    if (otpValue.length !== 8) { toast.error('Enter complete OTP'); return; }
+    if (otpValue.length !== 6) { toast.error('Enter complete 6-digit OTP'); return; }
     handleVerifyOtp(otpValue)
   }
 
@@ -132,12 +132,29 @@ export default function OTPLogin() {
     try {
       await sendOtp(email)
       toast.success('OTP resent!')
-      setOtp(Array(8).fill(''))
+      setOtp(Array(6).fill(''))
       setResendCooldown(30)
       otpRefs.current[0]?.focus()
     } catch (err: any) {
       toast.error(err.message || 'Failed to resend OTP.')
     } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true)
+      const { supabase } = await import('@/lib/supabase')
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth`
+        }
+      })
+      if (error) throw error
+    } catch (err: any) {
+      toast.error(err.message || 'Google sign-in failed')
       setLoading(false)
     }
   }
@@ -308,10 +325,25 @@ export default function OTPLogin() {
                     </Button>
                   </motion.div>
 
-                  <div className="text-center">
-                    <span className="text-xs text-slate-400 font-medium">Already have password? </span>
-                    <Link to="/auth" className="text-xs font-black text-[#1B5E20] hover:underline underline-offset-4">Sign in with password</Link>
+                  <div className="relative py-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t-[3px] border-slate-50"></span>
+                    </div>
+                    <div className="relative flex justify-center text-[10px] uppercase font-black text-slate-200 tracking-widest">
+                      <span className="bg-white px-6">OR CONTINUE WITH SOCIAL</span>
+                    </div>
                   </div>
+
+                  <Button 
+                    variant="outline" 
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    disabled={loading}
+                    className="w-full h-14 rounded-2xl border-2 border-slate-100 bg-white hover:bg-slate-50/50 text-slate-700 font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-4 transition-all shadow-sm disabled:opacity-60"
+                  >
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" alt="Google" />
+                    Continue with Google
+                  </Button>
                 </form>
               </motion.div>
             )}

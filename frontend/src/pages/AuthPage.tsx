@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sprout, Briefcase, ShieldCheck, Mail, Lock, LogIn, UserPlus, Globe, Check, Loader2, ArrowRight, ChevronDown, TrendingUp, CloudRain } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { supabase } from "@/lib/supabase"
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -355,6 +356,7 @@ export default function AuthPage() {
                 <Button 
                   variant="outline" 
                   type="button"
+                  onClick={() => supabase.auth.signInWithOAuth({ provider: 'google' })}
                   className="w-full h-16 rounded-2xl border-2 border-slate-100 bg-white hover:bg-slate-50/50 text-slate-700 font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-4 transition-all shadow-sm"
                 >
                   <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" alt="Google" />

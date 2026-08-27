@@ -12,4 +12,8 @@ export default defineConfig({
       "react-i18next": path.resolve(__dirname, "./src/i18n/useTranslation.ts"),
     },
   },
+  build: {
+    outDir: '../dist',
+    emptyOutDir: true,
+  },
 })
