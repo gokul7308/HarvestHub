@@ -1,202 +1,156 @@
-🌾 HarvestHub — Smart Agriculture & Trading Platform
+# 🌾 HarvestHub — Smart Agriculture & Trading Platform
 
-HarvestHub is an AI-powered smart agriculture and trading platform designed to connect farmers, merchants, and administrators through a unified digital platform.
+HarvestHub is an AI-enabled smart agriculture and trading platform designed to connect **farmers, merchants, and administrators** through a unified digital platform.
 
-The project is currently under active development. For Project Review-1, the core application architecture, responsive user interface, database integration, marketplace foundation, dashboards, analytics, and initial AI/backend components have been implemented.
+The platform provides a foundation for **crop management, agricultural marketplace activities, market insights, analytics, and AI-assisted decision support**.
 
-⸻
+For Project Review-1, the core application architecture, responsive user interface, dashboards, marketplace foundation, database integration, analytics, and initial AI/backend functionality have been implemented.
 
-🚀 Project Objective
+> 🚧 **Project Status:** Active Development  
+> 🎯 **Current Milestone:** Project Review-1 / Core Platform Foundation
 
-HarvestHub aims to provide farmers and agricultural stakeholders with a digital platform for managing crops, discovering market opportunities, analyzing agricultural information, and improving farming and trading decisions.
+---
+
+## 🚀 Project Objective
+
+HarvestHub aims to provide farmers and agricultural stakeholders with a digital platform for:
+
+- Managing agricultural crop listings
+- Discovering marketplace opportunities
+- Connecting farmers with merchants
+- Viewing agricultural and market information
+- Supporting crop-price decision making
+- Accessing AI-generated market insights
+- Improving farming and trading decisions through data-driven information
 
 The platform is designed around three primary user roles:
 
-* 👨‍🌾 Farmers
-* 🤝 Merchants
-* 🛠️ Administrators
+- 👨‍🌾 **Farmer**
+- 🤝 **Merchant**
+- 🛠️ **Administrator**
 
-⸻
+---
 
-✅ Completed So Far
+# ✅ Completed Features
 
-👨‍🌾 Farmer Module
+## 👨‍🌾 Farmer Module
 
-* Implemented the farmer dashboard interface.
-* Added crop listing management functionality.
-* Added interfaces for viewing crop-related information.
-* Implemented crop addition and editing workflows.
+The farmer module provides the foundation for managing agricultural products and accessing relevant information.
 
-🛒 Marketplace
+### Implemented
 
-* Implemented the agricultural marketplace interface.
-* Added crop/product browsing functionality.
-* Added search and filtering capabilities.
-* Developed the foundation for crop purchasing workflows.
+- Farmer dashboard interface
+- Crop information management
+- Crop listing creation workflow
+- Crop listing editing workflow
+- Crop listing management interface
+- Crop-related analytics and estimated-value presentation
+- Farmer-oriented dashboard components
 
-🤝 Merchant Module
+---
 
-* Implemented merchant-oriented dashboard interfaces.
-* Added crop demand and purchasing workflow interfaces.
-* Added initial order-related functionality.
+## 🛒 Agriculture Marketplace
 
-🛠️ Admin Module
+The marketplace provides a digital interface for discovering agricultural products.
 
-* Developed the administrative dashboard structure.
-* Added interfaces for managing platform activities.
-* Added administrative analytics views.
+### Implemented
 
-🤖 AI & Backend
+- Agricultural marketplace interface
+- Crop/product browsing
+- Crop listing display
+- Search functionality
+- Filtering functionality
+- Marketplace navigation
+- Foundation for crop purchasing workflows
 
-* Added AI-related API endpoints for prediction, insights, and assistant functionality.
-* Implemented the initial AI service/backend structure.
-* Added serverless API/backend components for application intelligence.
+The marketplace is designed to provide a direct connection between agricultural sellers and potential buyers.
 
-📊 Analytics
+---
 
-* Implemented dashboard visualizations using Recharts.
-* Added data-driven charts and analytics interfaces.
+## 🤝 Merchant Module
 
-🗄️ Database
+The merchant module provides interfaces for agricultural buyers and trading activities.
 
-* Integrated Supabase for application data management.
-* Added a structured database schema for the platform.
+### Implemented
 
-🎨 UI/UX
+- Merchant dashboard interface
+- Crop demand workflow foundation
+- Purchasing workflow interfaces
+- Order-related functionality foundation
+- Merchant-oriented marketplace interaction
 
-* Developed a responsive React-based interface.
-* Implemented Tailwind CSS styling.
-* Added light and dark theme support.
-* Structured the application into reusable components, pages, services, contexts, and utilities.
+Advanced negotiation and complete transaction management are planned for further development.
 
-⸻
+---
 
-🔄 Current Working Areas
+## 🛠️ Admin Module
 
-The current implementation provides the foundation of the HarvestHub platform, including:
+The administrator module provides the foundation for managing the platform.
 
-* Farmer dashboard and crop management
-* Marketplace browsing and filtering
-* Merchant workflow interfaces
-* Administrative dashboard
-* Application data layer
-* Dashboard analytics
-* Initial AI/backend functionality
-* Responsive user interface
-* Theme support
+### Implemented
 
-⸻
+- Administrative dashboard structure
+- Platform management interfaces
+- Administrative analytics views
+- User/platform management interface foundation
+- Admin-oriented navigation and dashboard components
 
-🚧 Pending Development
+---
 
-The following areas require further implementation, refinement, validation, or testing:
+# 🤖 AI & Intelligent Features
 
-* Improve and validate the AI-based crop price prediction pipeline.
-* Integrate and validate reliable historical, weather, demand, and seasonal datasets.
-* Improve AI-generated agricultural recommendations.
-* Complete advanced merchant negotiation and order-management workflows.
-* Strengthen authentication, authorization, and role-based access control.
-* Complete and refine KYC verification workflows.
-* Improve validation, error handling, and edge-case handling.
-* Perform broader end-to-end testing.
-* Optimize application performance and database queries.
-* Complete production deployment and monitoring.
+HarvestHub includes an initial server-side AI architecture for intelligent agriculture and marketplace features.
 
-⸻
+### Implemented AI Components
 
-🎯 Next Steps
+- AI crop-price prediction API
+- AI market insights API
+- AI assistant API
+- Server-side AI service
+- Structured AI prediction responses
+- AI-generated recommendations
+- AI-assisted market analysis
 
-The next phase of development will focus on:
+The current implementation uses the **Google Gemini API** through a server-side AI service.
 
-1. Refining and validating the AI prediction pipeline.
-2. Connecting prediction functionality with reliable agricultural datasets.
-3. Completing marketplace transaction workflows.
-4. Strengthening merchant and administrator functionality.
-5. Improving authentication and security.
-6. Performing comprehensive application testing.
-7. Optimizing the application for production deployment.
+---
 
-⸻
+## 🧠 AI Architecture
 
-🧰 Technology Stack
+The current AI request flow is:
 
-Frontend
-
-* React.js
-* TypeScript
-* Tailwind CSS
-* Vite
-
-UI & Visualization
-
-* Recharts
-* Framer Motion
-* Lucide React
-
-State & Forms
-
-* Context API
-* React Hook Form
-* Zod
-
-Backend
-
-* Serverless API functions
-* Netlify Functions / serverless backend components
-
-Database
-
-* Supabase
-
-AI
-
-* AI service/API integration
-
-Deployment
-
-* Netlify configuration included
-
-⸻
-
-📁 Project Structure
-
-HarvestHub/
-├── api/
-├── backend/
-│   └── functions/
-│       └── ai/
-├── database/
-│   └── schema/
-├── frontend/
-│   └── src/
-│       ├── components/
-│       ├── contexts/
-│       ├── data/
-│       ├── layouts/
-│       ├── lib/
-│       ├── pages/
-│       ├── services/
-│       ├── styles/
-│       ├── types/
-│       └── utils/
-├── netlify/
-├── dist/
-├── netlify.toml
-└── README.md
-
-⸻
-
-📌 Review-1 Status
-
-Project Status: Active Development
-
-Review-1 Focus: Core platform foundation and approximately the initial project milestone.
-
-The current milestone establishes the main application architecture, user interfaces, marketplace foundation, database layer, analytics, and initial AI/backend components. Further development will focus on completing advanced intelligence, transaction workflows, security, testing, and production readiness.
-
-⸻
-
-🔗 Repository
-
-GitHub:
-https://github.com/gokul7308/HarvestHub
+```text
+┌─────────────────────────┐
+│   HarvestHub Frontend   │
+│   Dashboard / User      │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│   Frontend AI Service   │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│   Serverless API        │
+│   /api/predict          │
+│   /api/insights         │
+│   /api/assistant        │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│   AI Backend Service    │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│    Google Gemini API    │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│ Structured AI Response  │
+│ Prediction / Insights   │
+│ Recommendation          │
+└─────────────────────────┘
