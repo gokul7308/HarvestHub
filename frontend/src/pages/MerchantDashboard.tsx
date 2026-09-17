@@ -15,6 +15,9 @@ import { ShoppingCart, TrendingUp, Handshake, Target, ArrowRight, Search, MapPin
 import { marketplaceListings } from "@/data/mock"
 import { useTranslation } from "react-i18next"
 
+import { getAiMarketInsights, getAiPricePrediction } from "@/services/aiService"
+import { Bot, Sparkles, TrendingDown, Layers, CheckCircle } from "lucide-react"
+
 const categoryData = [
   { name: 'Wheat', value: 4000 },
   { name: 'Corn', value: 3000 },
@@ -31,9 +34,46 @@ export default function MerchantDashboard() {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  const [merchantInsights, setMerchantInsights] = useState<any>(null)
+  const [loadingInsights, setLoadingInsights] = useState(false)
+
+  const [selectedCrop, setSelectedCrop] = useState("Wheat")
+  const [buyingAnalysis, setBuyingAnalysis] = useState<any>(null)
+  const [loadingBuying, setLoadingBuying] = useState(false)
+
   const myNegotiations = negotiations.filter((n: any) => n.buyer_name === user?.name)
   const pendingCount = myNegotiations.filter((n: any) => n.status === 'Pending').length
   const activeOrdersCount = orders.filter((o: any) => o.status !== 'Delivered').length
+
+  React.useEffect(() => {
+    async function fetchInsights() {
+      setLoadingInsights(true);
+      try {
+        const data = await getAiMarketInsights({ role: 'merchant' });
+        setMerchantInsights(data);
+      } catch (err) {
+        console.error('Failed to load merchant AI insights', err);
+      } finally {
+        setLoadingInsights(false);
+      }
+    }
+    fetchInsights();
+  }, []);
+
+  React.useEffect(() => {
+    async function fetchBuying() {
+      setLoadingBuying(true);
+      try {
+        const data = await getAiPricePrediction({ role: 'merchant', crop: selectedCrop, currentPrice: "3.50" });
+        setBuyingAnalysis(data);
+      } catch (err) {
+        console.error('Failed to load merchant buying insight', err);
+      } finally {
+        setLoadingBuying(false);
+      }
+    }
+    fetchBuying();
+  }, [selectedCrop]);
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12 font-sans selection:bg-blue-600/10 selection:text-blue-600">
@@ -217,13 +257,99 @@ export default function MerchantDashboard() {
           </div>
         </div>
 
-        {/* Analytics Panel */}
+        {/* Analytics & AI Intelligence Panel */}
         <div className="space-y-8">
-          <Card className="rounded-[32px] border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.04)] bg-white border-2 flex flex-col h-[400px]">
-            <CardHeader className="p-8 border-b border-slate-50 shrink-0">
-              <CardTitle className="text-xl font-black text-slate-900 tracking-tight leading-none">{t("merchant.procurementBySpend")}</CardTitle>
+          {/* AI Demand Intelligence */}
+          <Card className="rounded-[32px] border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.04)] bg-white border-2">
+            <CardHeader className="p-6 border-b border-slate-50">
+              <CardTitle className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <Sparkles size={20} className="text-blue-600" />
+                📊 AI Demand Intelligence
+              </CardTitle>
             </CardHeader>
-            <CardContent className="p-8 pt-10 flex-1 min-h-0">
+            <CardContent className="p-6 space-y-4">
+              {loadingInsights ? (
+                <div className="flex items-center gap-3 p-4 text-xs font-bold text-blue-600 animate-pulse">
+                  <div className="w-4 h-4 border-2 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
+                  Analyzing market demand...
+                </div>
+              ) : merchantInsights ? (
+                <div className="space-y-4">
+                  <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100">
+                    <p className="text-[10px] font-black uppercase text-blue-600 tracking-widest mb-1">High Demand Crops</p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {(merchantInsights.high_demand_crops || ['Wheat', 'Tomato', 'Rice']).map((crop: string, idx: number) => (
+                        <Badge key={idx} className="bg-blue-600 text-white font-bold text-[10px] px-2.5 py-1">
+                          🔥 {crop}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100">
+                    <p className="text-[10px] font-black uppercase text-emerald-700 tracking-widest mb-1">Purchasing Opportunities</p>
+                    <p className="text-xs font-semibold text-slate-700 mt-1">
+                      {merchantInsights.purchasing_opportunities?.[0] || 'Bulk tomato inventory available at 12% below regional average.'}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-xs text-slate-500 font-medium">
+                  AI Demand Intelligence temporarily unavailable.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* AI Buying / Price Insight */}
+          <Card className="rounded-[32px] border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.04)] bg-white border-2">
+            <CardHeader className="p-6 border-b border-slate-50 flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+                💰 AI Buying Insight
+              </CardTitle>
+              <select 
+                value={selectedCrop}
+                onChange={e => setSelectedCrop(e.target.value)}
+                className="border-2 border-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-50 px-3 py-1.5 outline-none focus:border-blue-600 cursor-pointer"
+              >
+                <option value="Wheat">Wheat</option>
+                <option value="Tomato">Tomato</option>
+                <option value="Rice">Rice</option>
+                <option value="Soybean">Soybean</option>
+              </select>
+            </CardHeader>
+            <CardContent className="p-6">
+              {loadingBuying ? (
+                <div className="flex items-center gap-3 p-4 text-xs font-bold text-blue-600 animate-pulse">
+                  <div className="w-4 h-4 border-2 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
+                  Calculating price valuation...
+                </div>
+              ) : buyingAnalysis ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Price Rating</span>
+                    <Badge className="bg-emerald-500 text-white font-black text-[10px] uppercase">
+                      Favorable Deal
+                    </Badge>
+                  </div>
+                  <p className="text-xs font-semibold text-slate-700 leading-relaxed bg-blue-50/40 p-4 rounded-2xl border border-blue-100/50">
+                    {buyingAnalysis.buying_insight || buyingAnalysis.recommendation || `Current market price for ${selectedCrop} is competitive with predicted upward trend.`}
+                  </p>
+                </div>
+              ) : (
+                <div className="p-4 rounded-2xl bg-slate-50 text-xs font-medium text-slate-500">
+                  Select a crop to evaluate buying insights.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Procurement by Spend */}
+          <Card className="rounded-[32px] border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.04)] bg-white border-2 flex flex-col h-[320px]">
+            <CardHeader className="p-6 border-b border-slate-50 shrink-0">
+              <CardTitle className="text-lg font-black text-slate-900 tracking-tight leading-none">{t("merchant.procurementBySpend")}</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 pt-8 flex-1 min-h-0">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={categoryData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />

@@ -1,4 +1,4 @@
-export async function getAiPricePrediction(data: any) {
+export async function getAiPricePrediction(data: Record<string, unknown>) {
   const response = await fetch('/api/predict', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -12,7 +12,7 @@ export async function getAiPricePrediction(data: any) {
   return response.json();
 }
 
-export async function getAiMarketInsights(data: any) {
+export async function getAiMarketInsights(data: Record<string, unknown>) {
   const response = await fetch('/api/insights', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -26,7 +26,7 @@ export async function getAiMarketInsights(data: any) {
   return response.json();
 }
 
-export async function askAiAssistant(query: string, contextData: any) {
+export async function askAiAssistant(query: string, contextData: Record<string, unknown>) {
   const response = await fetch('/api/assistant', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

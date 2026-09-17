@@ -11,7 +11,7 @@ import { Bot } from "lucide-react"
 import AiAssistantModal from "@/components/common/AiAssistantModal"
 
 export default function DashboardLayout() {
-  const { user, logout } = useUser()
+  const { user, logout, isDemoMode } = useUser()
   const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
@@ -109,6 +109,12 @@ export default function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-4">
+             {isDemoMode && (
+               <div className="flex items-center gap-2 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30 px-3.5 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm">
+                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                 DEMO MODE ({user.role.toUpperCase()})
+               </div>
+             )}
              <LanguageDropdown />
              <NotificationDropdown />
             <div className="h-8 w-[1px] bg-gray-200 dark:bg-white/10 mx-2"></div>

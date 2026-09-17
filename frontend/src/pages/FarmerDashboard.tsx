@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { CloudRain, Leaf, TrendingUp, TrendingDown, AlertTriangle, ArrowRight, Activity, MapPin, Plus, ShoppingBag, Check, X as CloseIcon, Handshake } from "lucide-react"
+import { CloudRain, Leaf, TrendingUp, TrendingDown, AlertTriangle, ArrowRight, Activity, MapPin, Plus, ShoppingBag, Check, X as CloseIcon, Handshake, Sparkles } from "lucide-react"
 import { Listing } from "@/types/listing"
 import { EditListingModal } from "@/components/crops/EditListingModal"
 import { AddCropModal } from "@/components/crops/AddCropModal"
@@ -35,6 +35,10 @@ export default function FarmerDashboard() {
   const [loadingPrice, setLoadingPrice] = useState(false)
 
   const [selectedCrop, setSelectedCrop] = useState<CropKey>('wheat')
+  const [locationInput, setLocationInput] = useState("California, USA")
+  const [quantityInput, setQuantityInput] = useState("500")
+  const [currentPriceInput, setCurrentPriceInput] = useState("3.50")
+
   const forecast = useMemo(() => getCropForecast(selectedCrop), [selectedCrop])
 
   React.useEffect(() => {
@@ -52,20 +56,27 @@ export default function FarmerDashboard() {
     fetchInsights();
   }, [selectedCrop]);
   
-  React.useEffect(() => {
-    async function fetchAiPrice() {
-      setLoadingPrice(true);
-      try {
-        const { getAiPricePrediction } = await import('@/services/aiService');
-        const price = await getAiPricePrediction({ crop: selectedCrop, date: new Date().toISOString() });
-        setAiPrice(price);
-      } catch (error) {
-        console.error('Failed to load AI price', error);
-      } finally {
-        setLoadingPrice(false);
-      }
+  const handlePredictPrice = async () => {
+    setLoadingPrice(true);
+    try {
+      const { getAiPricePrediction } = await import('@/services/aiService');
+      const price = await getAiPricePrediction({ 
+        crop: selectedCrop, 
+        location: locationInput,
+        quantity: quantityInput,
+        currentPrice: currentPriceInput,
+        role: 'farmer'
+      });
+      setAiPrice(price);
+    } catch (error) {
+      console.error('Failed to load AI price', error);
+    } finally {
+      setLoadingPrice(false);
     }
-    fetchAiPrice();
+  }
+
+  React.useEffect(() => {
+    handlePredictPrice();
   }, [selectedCrop]);
 
   const pendingNegotiations = negotiations.filter(n => n.status === 'Pending' && n.seller_name === user?.name)
@@ -194,8 +205,52 @@ export default function FarmerDashboard() {
               </select>
             </CardHeader>
             <CardContent className="p-8 flex-1 flex flex-col">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">All prices are per kilogram ($/kg)</p>
-              
+              {/* Inputs for AI Prediction */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <div>
+                  <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest block mb-1">Region / Location</label>
+                  <input 
+                    type="text" 
+                    value={locationInput}
+                    onChange={e => setLocationInput(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-[#1B5E20]"
+                    placeholder="e.g. California, USA"
+                  />
+                </div>
+                <div>
+                  <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest block mb-1">Harvest Quantity (kg)</label>
+                  <input 
+                    type="number" 
+                    value={quantityInput}
+                    onChange={e => setQuantityInput(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-[#1B5E20]"
+                    placeholder="500"
+                  />
+                </div>
+                <div>
+                  <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest block mb-1">Current Price ($/kg)</label>
+                  <input 
+                    type="number" 
+                    step="0.10"
+                    value={currentPriceInput}
+                    onChange={e => setCurrentPriceInput(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-[#1B5E20]"
+                    placeholder="3.50"
+                  />
+                </div>
+              </div>
+
+              <div className="mb-4 flex justify-end">
+                <Button 
+                  onClick={handlePredictPrice}
+                  disabled={loadingPrice}
+                  className="bg-[#1B5E20] hover:bg-[#1B5E20]/90 text-white font-black text-[10px] uppercase tracking-widest h-9 px-4 rounded-xl flex items-center gap-2 shadow-sm"
+                >
+                  {loadingPrice ? <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <Sparkles size={14} />}
+                  Recalculate AI Price
+                </Button>
+              </div>
+
               {loadingPrice ? (
                 <div className="flex items-center gap-2 mb-4 text-xs font-bold text-[#1B5E20] animate-pulse">
                    <div className="w-3 h-3 border-2 border-[#1B5E20]/20 border-t-[#1B5E20] rounded-full animate-spin" />
@@ -209,7 +264,7 @@ export default function FarmerDashboard() {
                    </div>
                    <div className="flex-1">
                      <p className="text-sm font-bold text-amber-900">{aiPrice.recommendation || `Market trend is ${aiPrice.trend || forecast.trendDirection}.`}</p>
-                     <p className="text-xs font-medium text-amber-800/80 mt-1">Min: ${aiPrice.min_price || 'N/A'} | Max: ${aiPrice.max_price || 'N/A'}</p>
+                     <p className="text-xs font-medium text-amber-800/80 mt-1">Min: ${aiPrice.min_price || 'N/A'} | Max: ${aiPrice.max_price || 'N/A'} | Trend: <span className="uppercase font-bold">{aiPrice.trend || 'stable'}</span></p>
                    </div>
                    <Badge className="bg-amber-500 text-white shadow-lg border-0 shrink-0 shadow-amber-500/20">AI Estimate</Badge>
                 </div>

@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react"
-import { users, User } from "@/data/mock"
+import { User } from "@/data/mock"
 import { supabase } from "@/lib/supabase"
 
 interface UserContextType {
   user: User | null
   loading: boolean
+  isDemoMode: boolean
   login: (role: 'farmer' | 'merchant' | 'admin') => Promise<void>
   logout: () => Promise<void>
   updateUser: (profile: Partial<User>) => Promise<void>
@@ -18,9 +19,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
+  const isDemoMode = Boolean(user?.id?.startsWith('demo-'))
+
   useEffect(() => {
+    let isMounted = true;
+
     // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!isMounted) return;
       if (session) {
         fetchProfile(session.user.id, session.user)
       } else {
@@ -38,7 +44,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    }
   }, [])
 
   const fetchProfile = async (userId: string, authUser?: any) => {
@@ -81,6 +90,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   const login = async (role: 'farmer' | 'merchant' | 'admin') => {
+    // Only use for Demo mode where real auth is skipped. 
+    // In production, real auth uses Supabase session.
     const demoUsers = {
       farmer: { id: 'demo-farmer', email: 'farmer@demo.com', name: 'Demo Farmer', role: 'farmer' as const, avatar: 'DF' },
       merchant: { id: 'demo-merchant', email: 'merchant@demo.com', name: 'Demo Merchant', role: 'merchant' as const, avatar: 'DM' },
@@ -91,7 +102,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = async () => {
-    await supabase.auth.signOut()
+    if (!isDemoMode) {
+      await supabase.auth.signOut()
+    }
     setUser(null)
   }
 
@@ -147,7 +160,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <UserContext.Provider value={{ user, loading, login, logout, updateUser, sendOtp, verifyOtp }}>
+    <UserContext.Provider value={{ user, loading, isDemoMode, login, logout, updateUser, sendOtp, verifyOtp }}>
       {children}
     </UserContext.Provider>
   )

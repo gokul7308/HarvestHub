@@ -19,7 +19,7 @@ const ROLE_META: Record<Role, { icon: string; label: string; desc: string; color
 type Step = 'email' | 'otp'
 
 export default function OTPLogin() {
-  const { sendOtp, verifyOtp, user } = useUser() as any;
+  const { sendOtp, verifyOtp, login, user } = useUser();
   const navigate = useNavigate()
 
   const [step, setStep] = useState<Step>('email')
@@ -62,7 +62,8 @@ export default function OTPLogin() {
       setStep('otp')
       toast.success('OTP sent! Check your inbox.')
       setResendCooldown(30)
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as Error;
       toast.error(err.message || 'Failed to send OTP. Please try again.')
     } finally {
       setLoading(false)
@@ -106,7 +107,8 @@ export default function OTPLogin() {
       await verifyOtp(email, token, name, role)
       toast.success('Successfully verified!')
       // Navigation handled by the useEffect watching `user`
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as Error;
       const msg = err.message?.toLowerCase() || ''
       if (msg.includes('expired') || msg.includes('invalid')) {
         toast.error('OTP expired. Please resend a new code.')
@@ -135,7 +137,8 @@ export default function OTPLogin() {
       setOtp(Array(6).fill(''))
       setResendCooldown(30)
       otpRefs.current[0]?.focus()
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as Error;
       toast.error(err.message || 'Failed to resend OTP.')
     } finally {
       setLoading(false)
@@ -153,7 +156,8 @@ export default function OTPLogin() {
         }
       })
       if (error) throw error
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as Error;
       toast.error(err.message || 'Google sign-in failed')
       setLoading(false)
     }
@@ -344,6 +348,34 @@ export default function OTPLogin() {
                     <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" alt="Google" />
                     Continue with Google
                   </Button>
+
+                  {/* Demo Login Section */}
+                  <div className="pt-6 mt-6 border-t border-slate-100">
+                    <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest text-center mb-3">Instant Demo Access</p>
+                    <div className="flex gap-2">
+                      <Button 
+                        type="button" 
+                        onClick={() => { login('farmer'); navigate('/farmer', { replace: true }); }} 
+                        className="flex-1 h-12 bg-emerald-50 border border-emerald-200 rounded-xl text-[10px] font-black uppercase text-emerald-800 hover:bg-emerald-100 transition-all shadow-sm flex items-center justify-center gap-1"
+                      >
+                        👨‍🌾 Demo Farmer
+                      </Button>
+                      <Button 
+                        type="button" 
+                        onClick={() => { login('merchant'); navigate('/merchant', { replace: true }); }} 
+                        className="flex-1 h-12 bg-blue-50 border border-blue-200 rounded-xl text-[10px] font-black uppercase text-blue-800 hover:bg-blue-100 transition-all shadow-sm flex items-center justify-center gap-1"
+                      >
+                        🛒 Demo Merchant
+                      </Button>
+                      <Button 
+                        type="button" 
+                        onClick={() => { login('admin'); navigate('/admin', { replace: true }); }} 
+                        className="flex-1 h-12 bg-purple-50 border border-purple-200 rounded-xl text-[10px] font-black uppercase text-purple-800 hover:bg-purple-100 transition-all shadow-sm flex items-center justify-center gap-1"
+                      >
+                        🛡️ Demo Admin
+                      </Button>
+                    </div>
+                  </div>
                 </form>
               </motion.div>
             )}

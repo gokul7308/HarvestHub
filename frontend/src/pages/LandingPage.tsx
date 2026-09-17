@@ -1,14 +1,15 @@
 import React from "react"
 import { motion } from "framer-motion"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { useUser } from "@/contexts/UserContext"
 import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { 
   ArrowRight, Sprout, TrendingUp, CloudRain, 
   Store, ShieldCheck, CheckCircle2,
-  Users, Bot, ShoppingCart, Activity, Globe, Check, ChevronDown,
-  Handshake, Zap
+  Bot, ShoppingCart, Activity, Globe, Check, ChevronDown,
+  Handshake
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
@@ -27,6 +28,8 @@ const staggerContainer: any = {
 
 export default function LandingPage() {
   const { t, i18n } = useTranslation();
+  const { login } = useUser();
+  const navigate = useNavigate();
   const [isLangOpen, setIsLangOpen] = React.useState(false);
 
   const languages = [
@@ -135,6 +138,36 @@ export default function LandingPage() {
                     {t("landing.explore")}
                   </Button>
                 </Link>
+              </motion.div>
+
+              {/* Instant Demo Access Box */}
+              <motion.div variants={fadeInUp} className="mt-6 p-4 rounded-3xl bg-slate-50 border-2 border-slate-100/80 shadow-sm max-w-lg">
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2.5">
+                  ⚡ Instant Demo Access (No Account Required)
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    type="button" 
+                    onClick={() => { login('farmer'); navigate('/farmer'); }} 
+                    className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5"
+                  >
+                    👨‍🌾 Demo Farmer
+                  </Button>
+                  <Button 
+                    type="button" 
+                    onClick={() => { login('merchant'); navigate('/merchant'); }} 
+                    className="flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5"
+                  >
+                    🛒 Demo Merchant
+                  </Button>
+                  <Button 
+                    type="button" 
+                    onClick={() => { login('admin'); navigate('/admin'); }} 
+                    className="flex-1 h-11 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5"
+                  >
+                    🛡️ Demo Admin
+                  </Button>
+                </div>
               </motion.div>
               
               <motion.div variants={fadeInUp} className="mt-12 flex items-center gap-6 text-sm text-slate-500 font-medium">

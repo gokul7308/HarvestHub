@@ -91,6 +91,27 @@ CREATE POLICY "Orders viewable by buyer and seller" ON public.orders FOR SELECT 
 );
 CREATE POLICY "Buyers can create orders" ON public.orders FOR INSERT WITH CHECK (auth.uid() = buyer_id);
 
+-- Offers: Managed by buyers and sellers
+CREATE POLICY "Offers viewable by buyer and seller" ON public.offers FOR SELECT USING (
+    auth.uid() = buyer_id OR 
+    EXISTS (SELECT 1 FROM public.crops WHERE id = listing_id AND farmer_id = auth.uid())
+);
+CREATE POLICY "Buyers can create offers" ON public.offers FOR INSERT WITH CHECK (auth.uid() = buyer_id);
+CREATE POLICY "Sellers can update offers" ON public.offers FOR UPDATE USING (
+    EXISTS (SELECT 1 FROM public.crops WHERE id = listing_id AND farmer_id = auth.uid())
+);
+
+-- Admin Override
+CREATE POLICY "Admins can view everything" ON public.profiles FOR SELECT USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+);
+CREATE POLICY "Admins can manage crops" ON public.crops ALL USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+);
+CREATE POLICY "Admins can manage demands" ON public.demands ALL USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+);
+
 -- 8. AUTOMATION - Auto-create profile on Auth Signup
 CREATE OR REPLACE FUNCTION public.handle_new_user() 
 RETURNS TRIGGER AS $$
