@@ -4,8 +4,10 @@ import { useUser } from './UserContext';
 
 export interface Order {
   id: string;
+  crop_id: string;
   crop: string;
-  quantity: string;
+  quantity: string | number;
+  total_price: number;
   seller_id: string;
   buyer_id: string;
   seller_name?: string;
@@ -25,43 +27,51 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 const defaultMockOrders: Order[] = [
   {
     id: "ORD-9421A",
+    crop_id: "mock-crop-1",
     crop: "Organic Premium Wheat",
     quantity: "50 Tons",
+    total_price: 25000,
     seller_id: "farmer-1",
     buyer_id: "demo-merchant",
     seller_name: "Midwest Agritech Farms",
     status: "In Transit",
-    date: new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0] // 2 days ago
+    date: new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0]
   },
   {
     id: "ORD-7714C",
+    crop_id: "mock-crop-2",
     crop: "Non-GMO Soybeans",
     quantity: "120 Tons",
+    total_price: 35000,
     seller_id: "farmer-2",
     buyer_id: "demo-merchant",
     seller_name: "Valley Co-op",
     status: "Pending",
-    date: new Date().toISOString().split('T')[0] // Today
+    date: new Date().toISOString().split('T')[0]
   },
   {
     id: "ORD-1198D",
+    crop_id: "mock-crop-3",
     crop: "Robusta Coffee Beans",
     quantity: "15 Tons",
+    total_price: 15000,
     seller_id: "farmer-3",
     buyer_id: "demo-merchant",
     seller_name: "Highland Estates",
     status: "Delivered",
-    date: new Date(Date.now() - 15 * 86400000).toISOString().split('T')[0] // 15 days ago
+    date: new Date(Date.now() - 15 * 86400000).toISOString().split('T')[0]
   },
   {
     id: "ORD-3392X",
+    crop_id: "mock-crop-4",
     crop: "Sweet Yellow Corn",
     quantity: "80 Tons",
+    total_price: 20000,
     seller_id: "farmer-4",
     buyer_id: "demo-merchant",
     seller_name: "Sunbelt Organics",
     status: "Delivered",
-    date: new Date(Date.now() - 45 * 86400000).toISOString().split('T')[0] // 45 days ago
+    date: new Date(Date.now() - 45 * 86400000).toISOString().split('T')[0]
   }
 ];
 
@@ -92,7 +102,8 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         .from('orders')
         .select(`
           *,
-          seller:seller_id(name)
+          seller:seller_id(name),
+          crop_details:crop_id(name)
         `)
         .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
@@ -102,7 +113,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       if (data) {
         setOrders(data.map((o: any) => ({
           ...o,
-          seller_name: o.seller?.name
+          crop: o.crop_details?.name || 'Crop',
+          seller_name: o.seller?.name,
+          date: o.created_at.split('T')[0],
+          status: o.status === 'pending' ? 'Pending' : o.status === 'shipped' ? 'In Transit' : 'Delivered'
         })) as Order[]);
       }
     } catch (error) {
@@ -124,17 +138,15 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('orders')
-        .insert([{
-          ...order,
-          date: new Date().toISOString().split('T')[0]
-        }])
-        .select()
-        .single();
+      const { data, error } = await supabase.rpc('place_order', {
+        p_crop_id: order.crop_id,
+        p_quantity: Number(order.quantity),
+        p_total_price: order.total_price
+      });
 
       if (error) throw error;
-      setOrders([data as Order, ...orders]);
+      // Refetch to get the joined fields properly
+      fetchOrders();
     } catch (error) {
       console.error('Error adding order:', error);
     }
@@ -147,9 +159,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      const dbStatus = status === 'Pending' ? 'pending' : status === 'In Transit' ? 'shipped' : 'completed';
       const { error } = await supabase
         .from('orders')
-        .update({ status })
+        .update({ status: dbStatus })
         .eq('id', id);
 
       if (error) throw error;

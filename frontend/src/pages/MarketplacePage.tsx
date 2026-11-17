@@ -12,6 +12,7 @@ import { useDemand } from "@/contexts/DemandContext"
 import { useUser } from "@/contexts/UserContext"
 import { useNegotiations } from "@/contexts/NegotiationContext"
 import { Listing } from "@/types/listing"
+import { BuyCropModal } from "@/components/merchant/BuyCropModal"
 
 export default function MarketplacePage() {
   const { t } = useTranslation()
@@ -20,6 +21,7 @@ export default function MarketplacePage() {
   const { user } = useUser()
   const { addNegotiation } = useNegotiations()
 
+  const [selectedCropForPurchase, setSelectedCropForPurchase] = useState<any | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [minPrice, setMinPrice] = useState("")
   const [maxPrice, setMaxPrice] = useState("")
@@ -222,7 +224,23 @@ export default function MarketplacePage() {
                       </div>
                       
                       <div className="flex gap-4 mt-8">
-                        <Button className="flex-1 h-12 bg-slate-900 hover:bg-black text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-slate-200 transition-all">
+                        <Button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedCropForPurchase({
+                              id: item.id || 'mock-id',
+                              name: name,
+                              price: item.price,
+                              quantity: item.quantity,
+                              unit: (item as any).unit || 'kg',
+                              location: location,
+                              farmerId: (item as any).farmerId || (item as any).farmer_id,
+                              farmerName: seller,
+                              images: (item as any).images || []
+                            });
+                          }}
+                          className="flex-1 h-12 bg-slate-900 hover:bg-black text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-slate-200 transition-all"
+                        >
                            {t("marketplace.buyNow")}
                         </Button>
                         <Button 
@@ -249,6 +267,13 @@ export default function MarketplacePage() {
           </div>
         </div>
       </div>
+
+      {/* Instant Buy Modal */}
+      <BuyCropModal
+        isOpen={Boolean(selectedCropForPurchase)}
+        onClose={() => setSelectedCropForPurchase(null)}
+        crop={selectedCropForPurchase}
+      />
     </div>
   )
 }

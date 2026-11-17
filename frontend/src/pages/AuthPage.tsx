@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useUser } from "@/contexts/UserContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Sprout, Briefcase, ShieldCheck, Mail, Lock, LogIn, UserPlus, Globe, Check, Loader2, ArrowRight, ChevronDown, TrendingUp, CloudRain } from "lucide-react"
+import { Sprout, Briefcase, ShieldCheck, Mail, Lock, Globe, Check, Loader2, ArrowRight, ChevronDown, TrendingUp, CloudRain } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { supabase } from "@/lib/supabase"
 
@@ -117,7 +117,7 @@ export default function AuthPage() {
             className={`absolute w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none`}
             style={{ 
               top: `${20 + (i * 15)}%`, 
-              left: `${10 + (Math.random() * 60)}%` 
+              left: `${10 + ((i * 13) % 60)}%` 
             }}
           />
         ))}

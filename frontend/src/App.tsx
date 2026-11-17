@@ -9,6 +9,7 @@ import { OrderProvider } from './contexts/OrderContext'
 import { NegotiationProvider } from './contexts/NegotiationContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { Toaster } from 'sonner'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 import DashboardLayout from './layouts/DashboardLayout'
 import LandingPage from './pages/LandingPage'
@@ -28,6 +29,7 @@ const AdminListingsPage = React.lazy(() => import('./pages/admin/AdminListingsPa
 const RevenuePage = React.lazy(() => import('./pages/admin/RevenuePage'))
 const MerchantDemandsPage = React.lazy(() => import('./pages/merchant/MerchantDemandsPage'))
 const MerchantOrdersPage = React.lazy(() => import('./pages/merchant/MerchantOrdersPage'))
+const UnauthorizedPage = React.lazy(() => import('./pages/UnauthorizedPage'))
 
 import { ProtectedRoute } from './components/ProtectedRoute'
 function AppRoutes() {
@@ -36,6 +38,7 @@ function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/auth" element={<OTPLogin />} />
       <Route path="/login" element={<OTPLogin />} />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
       
       <Route element={<DashboardLayout />}>
         <Route path="/farmer" element={
@@ -132,33 +135,35 @@ function AppRoutes() {
 
 function App() {
   return (
-    <ThemeProvider>
-      <UserProvider>
-        <SettingsProvider>
-          <ListingProvider>
-            <DemandProvider>
-              <OrderProvider>
-                <NegotiationProvider>
-                  <BrowserRouter>
-                    <React.Suspense fallback={
-                      <div className="h-screen w-screen flex flex-col items-center justify-center bg-slate-50">
-                        <div className="flex flex-col items-center gap-3">
-                          <div className="w-10 h-10 border-4 border-[#1B5E20]/20 border-t-[#1B5E20] rounded-full animate-spin"></div>
-                          <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Loading HarvestHub...</p>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <UserProvider>
+          <SettingsProvider>
+            <ListingProvider>
+              <DemandProvider>
+                <OrderProvider>
+                  <NegotiationProvider>
+                    <BrowserRouter>
+                      <React.Suspense fallback={
+                        <div className="h-screen w-screen flex flex-col items-center justify-center bg-slate-50">
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="w-10 h-10 border-4 border-[#1B5E20]/20 border-t-[#1B5E20] rounded-full animate-spin"></div>
+                            <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Loading HarvestHub...</p>
+                          </div>
                         </div>
-                      </div>
-                    }>
-                      <AppRoutes />
-                    </React.Suspense>
-                    <Toaster position="top-right" richColors theme="light" />
-                  </BrowserRouter>
-                </NegotiationProvider>
-              </OrderProvider>
-            </DemandProvider>
-          </ListingProvider>
-        </SettingsProvider>
-      </UserProvider>
-    </ThemeProvider>
+                      }>
+                        <AppRoutes />
+                      </React.Suspense>
+                      <Toaster position="top-right" richColors theme="light" />
+                    </BrowserRouter>
+                  </NegotiationProvider>
+                </OrderProvider>
+              </DemandProvider>
+            </ListingProvider>
+          </SettingsProvider>
+        </UserProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   )
 }
 

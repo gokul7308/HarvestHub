@@ -63,7 +63,7 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
   const fetchListings = async () => {
     try {
       const { data: listingsData, error: listingsError } = await supabase
-        .from('listings')
+        .from('crops')
         .select(`
           *,
           offers (*)
@@ -75,10 +75,16 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
       if (listingsData) {
         setListings(listingsData.map(l => ({
           ...l,
-          offers: l.offers.map((o: any) => ({
+          farmerId: l.farmer_id,
+          createdAt: l.created_at,
+          offers: l.offers ? l.offers.map((o: any) => ({
             ...o,
+            listingId: o.listing_id,
+            buyerId: o.buyer_id,
+            buyerName: o.buyer_name || 'Buyer',
+            createdAt: o.created_at,
             status: o.status as OfferStatus
-          }))
+          })) : []
         })));
       }
     } catch (error) {
@@ -107,7 +113,7 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const { data, error } = await supabase
-        .from('listings')
+        .from('crops')
         .insert([{
           ...listing,
           farmer_id: user.id,
@@ -118,7 +124,12 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
 
-      const newListing = { ...data, offers: [] } as Listing;
+      const newListing = { 
+        ...data, 
+        farmerId: data.farmer_id, 
+        createdAt: data.created_at, 
+        offers: [] 
+      } as Listing;
       setListings([newListing, ...listings]);
       toast.success("Crop Listing Added Successfully!");
     } catch (error) {
@@ -136,7 +147,7 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const { error } = await supabase
-        .from('listings')
+        .from('crops')
         .update(updates)
         .eq('id', id);
 
@@ -159,7 +170,7 @@ export function ListingProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const { error } = await supabase
-        .from('listings')
+        .from('crops')
         .delete()
         .eq('id', id);
 

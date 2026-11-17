@@ -1,0 +1,14 @@
+
+ RUN  v4.1.11 /Users/gokuls/MINI Projects/Agri-Hackathon/HarvestHub/frontend
+
+ ✓ tests/unit/calculations.test.ts (6 tests) 5ms
+ ✓ src/lib/validations.test.ts (6 tests) 3ms
+(node:12053) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ tests/validation/listing.test.ts (6 tests) 2ms
+
+ Test Files  3 passed (3)
+      Tests  18 passed (18)
+   Start at  16:11:08
+   Duration  563ms (transform 84ms, setup 137ms, import 231ms, tests 9ms, environment 807ms)
+

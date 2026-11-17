@@ -27,16 +27,22 @@ export function getCropForecast(cropKey: CropKey) {
   const factors = ['Weather impact', 'Demand level', 'Seasonal variation'];
 
   // Build Chart Data separating historical and predicted values to style them differently
-  const chartData = historical.map((price, idx) => ({
+  interface ChartData {
+    name: string;
+    historicalPrice?: number;
+    predictedPrice?: number;
+  }
+
+  const chartData: ChartData[] = historical.map((price, idx) => ({
     name: months[idx],
     historicalPrice: price,
   }));
 
   // Append predictions using original structure for Recharts
-  chartData.push({ name: months[n], historicalPrice: lastPrice, predictedPrice: lastPrice } as any);
-  chartData.push({ name: months[n + 1], predictedPrice: nextPrice1 } as any);
-  chartData.push({ name: months[n + 2], predictedPrice: nextPrice2 } as any);
-  chartData.push({ name: months[n + 3], predictedPrice: nextPrice3 } as any);
+  chartData.push({ name: months[n], historicalPrice: lastPrice, predictedPrice: lastPrice });
+  chartData.push({ name: months[n + 1], predictedPrice: nextPrice1 });
+  chartData.push({ name: months[n + 2], predictedPrice: nextPrice2 });
+  chartData.push({ name: months[n + 3], predictedPrice: nextPrice3 });
 
   return {
     chartData,

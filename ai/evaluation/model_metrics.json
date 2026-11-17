@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "dataset": "AGMARKNET Daily Mandi Wholesale Price Series (2025-01-01 to 2026-06-30)",
+    "commodities": [
+      "Onion",
+      "Potato",
+      "Tomato",
+      "Wheat",
+      "Rice"
+    ],
+    "markets": [
+      "Azadpur",
+      "Bangalore",
+      "Lasalgaon",
+      "Mumbai",
+      "Nashik",
+      "Pune"
+    ],
+    "total_records": 15480,
+    "train_records": 12360,
+    "test_records": 3120,
+    "split_date": "2026-03-19",
+    "features": [
+      "State",
+      "Market",
+      "Commodity",
+      "Month",
+      "DayOfWeek",
+      "Quarter",
+      "Lag_1",
+      "Lag_7",
+      "Lag_30",
+      "RollMean_7",
+      "RollMean_30"
+    ]
+  },
+  "baselines": {
+    "lag_1_last_known": {
+      "MAE": 118.43,
+      "RMSE": 170.95,
+      "R2": 0.9559,
+      "MAPE": 6.31
+    },
+    "commodity_mean": {
+      "MAE": 376.1,
+      "RMSE": 500.29,
+      "R2": 0.6223,
+      "MAPE": 21.18
+    },
+    "rolling_7d_mean": {
+      "MAE": 100.43,
+      "RMSE": 148.36,
+      "R2": 0.9668,
+      "MAPE": 5.32
+    }
+  },
+  "models": {
+    "LinearRegression": {
+      "MAE": 97.57,
+      "RMSE": 143.65,
+      "R2": 0.9689,
+      "MAPE": 5.2
+    },
+    "RandomForest": {
+      "MAE": 96.8,
+      "RMSE": 140.46,
+      "R2": 0.9702,
+      "MAPE": 5.13
+    },
+    "GradientBoosting": {
+      "MAE": 97.41,
+      "RMSE": 142.59,
+      "R2": 0.9693,
+      "MAPE": 5.21
+    }
+  },
+  "selection": {
+    "best_model": "RandomForest",
+    "best_rmse": 140.46,
+    "best_mae": 96.8,
+    "best_r2": 0.9702,
+    "best_mape": 5.13,
+    "baseline_best_rmse": 148.36,
+    "baseline_best_mae": 100.43,
+    "mae_improvement_pct": 3.61
+  }
+}

@@ -10,7 +10,7 @@ import { ImageUploader } from '../common/ImageUploader';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const listingSchema = z.object({
+export const listingSchema = z.object({
   name: z.string().min(3, "Title must be at least 3 characters"),
   price: z.number().positive("Price must be greater than 0"),
   quantity: z.number().positive("Quantity must be greater than 0"),

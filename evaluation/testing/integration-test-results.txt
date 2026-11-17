@@ -1,0 +1,13 @@
+
+ RUN  v4.1.11 /Users/gokuls/MINI Projects/Agri-Hackathon/HarvestHub/frontend
+
+ ✓ tests/orders/atomic.test.ts (6 tests) 2ms
+ ✓ tests/rbac/rbac.test.tsx (6 tests) 23ms
+ ✓ tests/integration/workflows.test.ts (10 tests) 4ms
+ ✓ tests/errors/errorBoundary.test.tsx (2 tests) 22ms
+
+ Test Files  4 passed (4)
+      Tests  24 passed (24)
+   Start at  16:11:18
+   Duration  687ms (transform 134ms, setup 335ms, import 252ms, tests 51ms, environment 1.66s)
+

@@ -23,6 +23,27 @@ interface NegotiationContextType {
 
 const NegotiationContext = createContext<NegotiationContextType | undefined>(undefined);
 
+const defaultMockNegotiations: Negotiation[] = [
+  {
+    id: "NEG-101",
+    crop_name: "Organic Premium Wheat",
+    buyer_name: "Demo Merchant",
+    seller_name: "Demo Farmer",
+    price: "$0.42 / kg",
+    status: "Pending",
+    listing_id: "LIST-992A"
+  },
+  {
+    id: "NEG-102",
+    crop_name: "Golden Soybeans",
+    buyer_name: "Demo Merchant",
+    seller_name: "Demo Farmer",
+    price: "$0.32 / kg",
+    status: "Accepted",
+    listing_id: "LIST-881B"
+  }
+];
+
 export function NegotiationProvider({ children }: { children: React.ReactNode }) {
   const [negotiations, setNegotiations] = useState<Negotiation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,24 +60,29 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
       return;
     }
 
+    if (user.id.startsWith('demo-')) {
+      setNegotiations(defaultMockNegotiations);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('offers')
         .select(`
           *,
-          listings (name, farmer_id, profiles!listings_farmer_id_fkey(name)),
+          crops:listing_id (name, farmer_id, profiles:farmer_id(name)),
           buyer:buyer_id(name)
-        `)
-        .or(`buyer_id.eq.${user.id},listings.farmer_id.eq.${user.id}`);
+        `);
 
       if (error) throw error;
       
       if (data) {
         setNegotiations(data.map((o: any) => ({
           id: o.id,
-          crop_name: o.listings?.name,
-          buyer_name: o.buyer?.name,
-          seller_name: o.listings?.profiles?.name,
+          crop_name: o.crops?.name || 'Crop',
+          buyer_name: o.buyer?.name || 'Buyer',
+          seller_name: o.crops?.profiles?.name || 'Seller',
           price: `$${o.price} / kg`,
           status: o.status as any,
           listing_id: o.listing_id
@@ -71,6 +97,20 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
 
   const addNegotiation = async (offer: { listing_id: string, price: number, quantity: number, message?: string }) => {
     if (!user) return;
+    if (user.id.startsWith('demo-')) {
+      const newNeg: Negotiation = {
+        id: `NEG-${Date.now().toString().slice(-4)}`,
+        crop_name: "Selected Crop",
+        buyer_name: user.name || "Demo Buyer",
+        seller_name: "Midwest Agritech",
+        price: `$${offer.price} / kg`,
+        status: "Pending",
+        listing_id: offer.listing_id
+      };
+      setNegotiations(prev => [newNeg, ...prev]);
+      toast.success("Negotiation initiated (Demo Mode)");
+      return;
+    }
     try {
       const { error } = await supabase
         .from('offers')
@@ -90,6 +130,11 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
   };
 
   const acceptNegotiation = async (id: string, listingId: string) => {
+    if (user?.id.startsWith('demo-')) {
+      setNegotiations(prev => prev.map(n => n.id === id ? { ...n, status: 'Accepted' } : n));
+      toast.success("Negotiation accepted (Demo Mode)");
+      return;
+    }
     try {
       const { error } = await supabase
         .from('offers')
@@ -97,9 +142,6 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
         .eq('id', id);
 
       if (error) throw error;
-      
-      // Also maybe update listing status if needed
-      
       toast.success("Negotiation accepted");
       fetchNegotiations();
     } catch (error) {
@@ -108,6 +150,11 @@ export function NegotiationProvider({ children }: { children: React.ReactNode })
   };
 
   const rejectNegotiation = async (id: string) => {
+    if (user?.id.startsWith('demo-')) {
+      setNegotiations(prev => prev.map(n => n.id === id ? { ...n, status: 'Rejected' } : n));
+      toast.info("Negotiation rejected (Demo Mode)");
+      return;
+    }
     try {
       const { error } = await supabase
         .from('offers')

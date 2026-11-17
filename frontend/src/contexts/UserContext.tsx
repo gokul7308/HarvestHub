@@ -24,12 +24,23 @@ export function UserProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true;
 
+    // Check for active demo session
+    const demoStored = typeof window !== 'undefined' ? localStorage.getItem('harvesthub_demo_user') : null;
+    if (demoStored) {
+      try {
+        setUser(JSON.parse(demoStored));
+        setLoading(false);
+      } catch {
+        localStorage.removeItem('harvesthub_demo_user');
+      }
+    }
+
     // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!isMounted) return;
       if (session) {
         fetchProfile(session.user.id, session.user)
-      } else {
+      } else if (!demoStored) {
         setLoading(false)
       }
     })
@@ -97,11 +108,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
       merchant: { id: 'demo-merchant', email: 'merchant@demo.com', name: 'Demo Merchant', role: 'merchant' as const, avatar: 'DM' },
       admin: { id: 'demo-admin', email: 'admin@demo.com', name: 'Demo Admin', role: 'admin' as const, avatar: 'DA' }
     };
-    setUser(demoUsers[role]);
+    const selected = demoUsers[role];
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('harvesthub_demo_user', JSON.stringify(selected));
+    }
+    setUser(selected);
     setLoading(false)
   }
 
   const logout = async () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('harvesthub_demo_user');
+    }
     if (!isDemoMode) {
       await supabase.auth.signOut()
     }

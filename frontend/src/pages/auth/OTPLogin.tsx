@@ -387,7 +387,7 @@ export default function OTPLogin() {
                 transition={{ duration: 0.35 }}
               >
                 {/* Back */}
-                <button onClick={() => { setStep('email'); setOtp(Array(8).fill('')) }}
+                <button onClick={() => { setStep('email'); setOtp(Array(6).fill('')) }}
                   className="flex items-center gap-2 text-slate-400 hover:text-slate-700 text-xs font-black uppercase tracking-widest mb-8 transition-colors"
                 >
                   <ChevronLeft size={16} /> Change Email
@@ -404,7 +404,7 @@ export default function OTPLogin() {
                   </p>
                 </div>
 
-                {/* 8 OTP boxes */}
+                {/* 6 OTP boxes */}
                 <div className="flex gap-2 justify-center mb-8" onPaste={handleOtpPaste}>
                   {otp.map((digit, i) => (
                     <input key={i}
@@ -425,7 +425,7 @@ export default function OTPLogin() {
                 </div>
 
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} className="mb-5">
-                  <Button onClick={handleVerifyClick} disabled={loading || otp.join('').length !== 8}
+                  <Button onClick={handleVerifyClick} disabled={loading || otp.join('').length !== 6}
                     className="w-full h-14 rounded-2xl bg-gradient-to-r from-[#1B5E20] to-[#2E7D32] text-white font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-[#1B5E20]/20 hover:brightness-110 transition-all disabled:opacity-60 flex items-center justify-center gap-3"
                   >
                     {loading ? <Loader2 size={22} className="animate-spin" /> : <><ShieldCheck size={18} /> Verify OTP <ArrowRight size={16} /></>}

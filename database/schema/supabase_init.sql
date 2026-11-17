@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     crop_id UUID REFERENCES public.crops(id) ON DELETE SET NULL,
     buyer_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    seller_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     quantity INTEGER NOT NULL,
     total_price FLOAT NOT NULL,
     status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'shipped', 'cancelled')),
@@ -86,10 +87,12 @@ CREATE POLICY "Merchants can manage own demands" ON public.demands FOR UPDATE US
 
 -- Orders: Managed by buyers and sellers
 CREATE POLICY "Orders viewable by buyer and seller" ON public.orders FOR SELECT USING (
-    auth.uid() = buyer_id OR 
-    EXISTS (SELECT 1 FROM public.crops WHERE id = crop_id AND farmer_id = auth.uid())
+    auth.uid() = buyer_id OR auth.uid() = seller_id
 );
 CREATE POLICY "Buyers can create orders" ON public.orders FOR INSERT WITH CHECK (auth.uid() = buyer_id);
+CREATE POLICY "Buyers and sellers can update orders" ON public.orders FOR UPDATE USING (
+    auth.uid() = buyer_id OR auth.uid() = seller_id
+);
 
 -- Offers: Managed by buyers and sellers
 CREATE POLICY "Offers viewable by buyer and seller" ON public.offers FOR SELECT USING (
@@ -125,3 +128,50 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 9. ATOMIC TRANSACTIONS
+CREATE OR REPLACE FUNCTION public.place_order(
+    p_crop_id UUID,
+    p_quantity INTEGER,
+    p_total_price FLOAT
+) RETURNS public.orders
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_crop public.crops%ROWTYPE;
+    v_order public.orders;
+BEGIN
+    -- Ensure user is authenticated
+    IF auth.uid() IS NULL THEN
+        RAISE EXCEPTION 'Not authenticated';
+    END IF;
+
+    -- Lock the crop row for concurrency safety
+    SELECT * INTO v_crop
+    FROM public.crops
+    WHERE id = p_crop_id AND status = 'Active'
+    FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Crop not found or not active';
+    END IF;
+
+    IF v_crop.quantity < p_quantity THEN
+        RAISE EXCEPTION 'Insufficient quantity available. Requested %, available %', p_quantity, v_crop.quantity;
+    END IF;
+
+    -- Update crop quantity
+    UPDATE public.crops
+    SET quantity = quantity - p_quantity,
+        status = CASE WHEN quantity - p_quantity = 0 THEN 'Sold' ELSE status END
+    WHERE id = p_crop_id;
+
+    -- Create the order
+    INSERT INTO public.orders (crop_id, buyer_id, seller_id, quantity, total_price, status)
+    VALUES (p_crop_id, auth.uid(), v_crop.farmer_id, p_quantity, p_total_price, 'pending')
+    RETURNING * INTO v_order;
+
+    RETURN v_order;
+END;
+$$;

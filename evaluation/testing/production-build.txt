@@ -1,0 +1,59 @@
+
+> harvesthub@0.0.0 build
+> tsc -b && vite build
+
+vite v8.0.3 building client environment for production...
+[2Ktransforming...✓ 2875 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/index.html                                           1.27 kB │ gzip:   0.53 kB
+../dist/assets/index-oVU4UPpu.css                          110.61 kB │ gzip:  16.43 kB
+../dist/assets/dist-BPA83dQO.js                              0.05 kB │ gzip:   0.07 kB
+../dist/assets/arrow-left-Bl2BVYX9.js                        0.16 kB │ gzip:   0.16 kB
+../dist/assets/clock-BzUIRpB4.js                             0.16 kB │ gzip:   0.16 kB
+../dist/assets/graphicalItemSelectors-CdJgvEDK.js            0.19 kB │ gzip:   0.12 kB
+../dist/assets/circle-x-DIc7lqG2.js                          0.20 kB │ gzip:   0.17 kB
+../dist/assets/dollar-sign-VBi6YLvY.js                       0.21 kB │ gzip:   0.19 kB
+../dist/assets/download-Dikilk-D.js                          0.23 kB │ gzip:   0.19 kB
+../dist/assets/circle-alert-Bhu7Fevy.js                      0.25 kB │ gzip:   0.18 kB
+../dist/assets/funnel-DhDzS57H.js                            0.25 kB │ gzip:   0.21 kB
+../dist/assets/users-CscXcZR1.js                             0.30 kB │ gzip:   0.22 kB
+../dist/assets/shopping-bag-Clt3UNba.js                      0.34 kB │ gzip:   0.24 kB
+../dist/assets/shield-alert-vi0Zgdxb.js                      0.35 kB │ gzip:   0.25 kB
+../dist/assets/building-2-CDo4B6ia.js                        0.38 kB │ gzip:   0.23 kB
+../dist/assets/tooltipContext-CGhW9pOX.js                    0.50 kB │ gzip:   0.27 kB
+../dist/assets/ErrorBarContext-CodbtqAg.js                   0.67 kB │ gzip:   0.42 kB
+../dist/assets/aiService-BsaC9HCq.js                         0.81 kB │ gzip:   0.35 kB
+../dist/assets/UnauthorizedPage-D4wQKDdA.js                  1.33 kB │ gzip:   0.66 kB
+../dist/assets/mock-DKIpvgZJ.js                              1.36 kB │ gzip:   0.56 kB
+../dist/assets/modal-DvbbMxeI.js                             1.56 kB │ gzip:   0.79 kB
+../dist/assets/UserContext-D0eWaBmk.js                       2.21 kB │ gzip:   1.04 kB
+../dist/assets/EditListingModal-CyZjBj_2.js                  2.96 kB │ gzip:   1.06 kB
+../dist/assets/react-dom-CET4EjD8.js                         3.53 kB │ gzip:   1.33 kB
+../dist/assets/ListingsPage-BOnYevqY.js                      4.10 kB │ gzip:   1.62 kB
+../dist/assets/MerchantDemandsPage-DB0cH0Qp.js               4.68 kB │ gzip:   1.53 kB
+../dist/assets/getRadiusAndStrokeWidthFromDot-ClXRh-5k.js    5.10 kB │ gzip:   1.74 kB
+../dist/assets/MerchantOrdersPage-C9aYGllx.js                5.18 kB │ gzip:   1.59 kB
+../dist/assets/MerchantsPage-VAkO-3rn.js                     5.19 kB │ gzip:   1.79 kB
+../dist/assets/AdminListingsPage-_Jz0jz6i.js                 5.30 kB │ gzip:   1.80 kB
+../dist/assets/FarmersPage-CaQcvqkH.js                       5.49 kB │ gzip:   1.85 kB
+../dist/assets/RevenuePage-BkvhSHd4.js                       7.53 kB │ gzip:   2.19 kB
+../dist/assets/react-DtrESx-C.js                             8.28 kB │ gzip:   3.20 kB
+../dist/assets/SystemSettings-DExGGBp4.js                    9.74 kB │ gzip:   2.68 kB
+../dist/assets/LineChart-yP4Laepk.js                         9.81 kB │ gzip:   3.93 kB
+../dist/assets/AreaChart-CVK28nkJ.js                        12.15 kB │ gzip:   4.46 kB
+../dist/assets/AdminDashboard-CdcIfwtL.js                   12.72 kB │ gzip:   3.91 kB
+../dist/assets/MarketplacePage-Bn4W-AJ7.js                  17.14 kB │ gzip:   4.76 kB
+../dist/assets/AnalyticsPage-D15RB8cy.js                    27.55 kB │ gzip:   8.42 kB
+../dist/assets/createLucideIcon-Drr-Ih7r.js                 28.21 kB │ gzip:   9.31 kB
+../dist/assets/SettingsPage-jp1fp2KW.js                     29.47 kB │ gzip:   7.84 kB
+../dist/assets/dist-DZyFf6IS.js                             32.56 kB │ gzip:   9.12 kB
+../dist/assets/MerchantDashboard-gR-1XJCg.js                37.39 kB │ gzip:  10.80 kB
+../dist/assets/FarmerDashboard-DUOKRaCr.js                  45.48 kB │ gzip:  12.16 kB
+../dist/assets/schemas-BwoP41qi.js                          92.21 kB │ gzip:  27.41 kB
+../dist/assets/proxy-BHvihKA1.js                           120.61 kB │ gzip:  39.14 kB
+../dist/assets/supabase-DFCBp-0j.js                        208.89 kB │ gzip:  54.08 kB
+../dist/assets/CartesianChart-huX0pGz3.js                  330.93 kB │ gzip:  98.01 kB
+../dist/assets/index-DPNY3_Jo.js                           359.79 kB │ gzip: 108.56 kB
+
+✓ built in 252ms

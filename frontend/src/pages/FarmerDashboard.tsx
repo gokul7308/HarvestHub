@@ -12,6 +12,7 @@ import { Listing } from "@/types/listing"
 import { EditListingModal } from "@/components/crops/EditListingModal"
 import { AddCropModal } from "@/components/crops/AddCropModal"
 import { OffersModal } from "@/components/offers/OffersModal"
+import { PricePredictionChart } from "@/components/PricePredictionChart"
 import { useTranslation } from "react-i18next"
 import { getCropForecast, CropKey } from "@/lib/forecast"
 import { useNavigate } from "react-router-dom"
@@ -56,7 +57,7 @@ export default function FarmerDashboard() {
     fetchInsights();
   }, [selectedCrop]);
   
-  const handlePredictPrice = async () => {
+  const handlePredictPrice = React.useCallback(async () => {
     setLoadingPrice(true);
     try {
       const { getAiPricePrediction } = await import('@/services/aiService');
@@ -73,11 +74,11 @@ export default function FarmerDashboard() {
     } finally {
       setLoadingPrice(false);
     }
-  }
+  }, [selectedCrop, locationInput, quantityInput, currentPriceInput]);
 
   React.useEffect(() => {
     handlePredictPrice();
-  }, [selectedCrop]);
+  }, [handlePredictPrice]);
 
   const pendingNegotiations = negotiations.filter(n => n.status === 'Pending' && n.seller_name === user?.name)
 
@@ -311,6 +312,8 @@ export default function FarmerDashboard() {
               </div>
             </CardContent>
           </Card>
+
+          <PricePredictionChart />
 
           {/* Pending Negotiations Section */}
           {pendingNegotiations.length > 0 && (
