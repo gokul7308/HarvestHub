@@ -55,7 +55,7 @@ def predict_price(req: PredictionRequest):
         
     # 2. Validate crop compatibility SECOND
     if req.crop not in SUPPORTED_CROPS:
-        raise HTTPException(status_code=400, detail=f"Unknown crop. Supported: {', '.join(SUPPORTED_CROPS[:3])}")
+        raise HTTPException(status_code=400, detail=f"Unknown crop. Supported: {', '.join(SUPPORTED_CROPS)}")
         
     # 3. Verify model availability THIRD
     if not model:

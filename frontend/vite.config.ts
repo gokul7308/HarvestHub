@@ -1,15 +1,15 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
+import { fileURLToPath } from 'url'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "react-i18next": path.resolve(__dirname, "./src/i18n/useTranslation.ts"),
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "react-i18next": fileURLToPath(new URL("./src/i18n/useTranslation.ts", import.meta.url)),
     },
   },
   build: {

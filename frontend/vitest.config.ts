@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import path from 'path'
+import { fileURLToPath } from 'url'
 
 export default defineConfig({
   plugins: [react()],
@@ -8,10 +8,14 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/setupTests.ts',
+    env: {
+      VITE_SUPABASE_URL: 'https://test-project.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'test-anon-key-placeholder',
+    },
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
+      '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   }
 })

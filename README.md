@@ -4,7 +4,7 @@
 [![React 19](https://img.shields.io/badge/Frontend-React%2019%20%2B%20TypeScript-blue?style=for-the-badge)](https://react.dev/)
 [![Supervised ML](https://img.shields.io/badge/ML%20Engine-Random%20Forest%20(R²%3D0.9702)-emerald?style=for-the-badge)](docs/AI_MODEL_EVALUATION.md)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20(Supabase%20RLS)-3ECF8E?style=for-the-badge)](docs/DATABASE_SCHEMA.md)
-[![Tests Passing](https://img.shields.io/badge/Tests-63%20Passed%20(0%20Failed)-success?style=for-the-badge)](docs/TESTING_REPORT.md)
+[![Tests Passing](https://img.shields.io/badge/Tests-64%20Passed%20(0%20Failed)-success?style=for-the-badge)](docs/TESTING_REPORT.md)
 
 HarvestHub is a full-stack, AI-enabled agricultural marketplace and decision-support platform designed to connect smallholder farmers directly with agricultural merchants and bulk buyers. The platform eliminates intermediary exploitation through transparent price discovery, empirical machine learning price regression, concurrency-locked atomic trading, and database-level Row-Level Security (RLS).
 
@@ -202,7 +202,7 @@ npm test
 ```bash
 ./ml/venv312/bin/pytest ml/tests/
 ```
-* **Status:** 8 passed (8) across `ml/tests/test_ml.py` (0 failures).
+* **Status:** 9 passed (9) across `ml/tests/test_ml.py` (0 failures).
 
 ### Production Build Verification
 ```bash

@@ -14,9 +14,9 @@
 | **Unit Testing** | 18 | 18 | 0 | 100% | Vitest (JSDOM) | **PASSED** |
 | **Integration Testing** | 24 | 24 | 0 | 100% | Vitest (JSDOM) | **PASSED** |
 | **Security & Auth Testing** | 10 | 10 | 0 | 100% | Vitest (JSDOM) | **PASSED** |
-| **ML Pipeline & API Testing** | 8 | 8 | 0 | 100% | Pytest / Starlette TestClient | **PASSED** |
+| **ML Pipeline & API Testing** | 9 | 9 | 0 | 100% | Pytest / Starlette TestClient | **PASSED** |
 | **Production Build Verification** | 1 | 1 | 0 | 100% | `tsc -b && vite build` | **PASSED** |
-| **TOTAL VERIFIED SUITES** | **61** | **61** | **0** | **100%** | Multi-Language CI/CD | **PASSED** |
+| **TOTAL VERIFIED SUITES** | **62** | **62** | **0** | **100%** | Multi-Language CI/CD | **PASSED** |
 
 ---
 
@@ -67,8 +67,8 @@
   * XSS and SQL injection payloads rejected via strict input sanitization.
   * Zero and negative quantity injections rejected.
 
-### 2.4 Machine Learning & Serving Tests (8 Tests, 100% Pass)
-* **Suites Executed:** `ml/tests/test_ml.py` (8 tests)
+### 2.4 Machine Learning & Serving Tests (9 Tests, 100% Pass)
+* **Suites Executed:** `ml/tests/test_ml.py` (9 tests)
 * **Verifications Covered:**
   * Zero data leakage in backward lag feature creation (`Lag_1`).
   * Automatic filtering of non-positive modal prices.
@@ -78,6 +78,7 @@
   * Rejection of unsupported commodity crops with 400 Bad Request.
   * Rejection of invalid date formats with 400 Bad Request.
   * Pydantic schema validation on missing required parameters (422 Unprocessable Entity).
+  * Synchronization between `/health` supported crops list and validation error detail.
 
 ---
 

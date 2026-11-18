@@ -124,3 +124,31 @@ def test_api_missing_field():
     }
     response = client.post("/predict", json=req)
     assert response.status_code == 422 # Pydantic validation error
+
+def test_supported_crops_consistency():
+    # 1. Query the health endpoint
+    health_res = client.get("/health")
+    assert health_res.status_code == 200
+    health_crops = health_res.json().get("supported_crops", [])
+    assert len(health_crops) == 5
+    assert set(health_crops) == {"Onion", "Potato", "Tomato", "Wheat", "Rice"}
+    
+    # 2. Query unknown crop to trigger validation error
+    req = {
+        "crop": "UnsupportedExoticCrop",
+        "market": "Pune",
+        "state": "Maharashtra",
+        "date": "2026-05-01",
+        "lag_1": 1500,
+        "lag_7": 1400,
+        "lag_30": 1300,
+        "roll_mean_7": 1450,
+        "roll_mean_30": 1350
+    }
+    pred_res = client.post("/predict", json=req)
+    assert pred_res.status_code == 400
+    err_detail = pred_res.json()["detail"]
+    
+    # 3. Assert all supported crops from health check are reflected in the validation message
+    for crop in health_crops:
+        assert crop in err_detail
