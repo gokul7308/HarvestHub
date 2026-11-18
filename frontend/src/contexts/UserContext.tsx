@@ -16,8 +16,26 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window !== 'undefined') {
+      const demoStored = localStorage.getItem('harvesthub_demo_user');
+      if (demoStored) {
+        try {
+          return JSON.parse(demoStored);
+        } catch {
+          localStorage.removeItem('harvesthub_demo_user');
+        }
+      }
+    }
+    return null;
+  })
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const demoStored = localStorage.getItem('harvesthub_demo_user');
+      if (demoStored) return false;
+    }
+    return true;
+  })
 
   const isDemoMode = Boolean(user?.id?.startsWith('demo-'))
 
@@ -50,8 +68,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
       if (session) {
         fetchProfile(session.user.id, session.user)
       } else {
-        setUser(null)
-        setLoading(false)
+        const hasDemoStored = typeof window !== 'undefined' && localStorage.getItem('harvesthub_demo_user');
+        if (!hasDemoStored) {
+          setUser(null)
+          setLoading(false)
+        }
       }
     })
 
@@ -63,6 +84,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const fetchProfile = async (userId: string, authUser?: any) => {
     try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('harvesthub_demo_user');
+      }
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -137,6 +161,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
     
     // Check if profile exists, if not, create it
     if (data?.session) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('harvesthub_demo_user');
+      }
       const userId = data.session.user.id;
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')

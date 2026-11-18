@@ -1,5 +1,5 @@
 import React from "react"
-import { Outlet, Link, NavLink, useLocation, useNavigate } from "react-router-dom"
+import { Outlet, Link, NavLink, useLocation, useNavigate, Navigate } from "react-router-dom"
 import { useUser } from "@/contexts/UserContext"
 import { LayoutDashboard, Store, LineChart, List, Settings, LogOut, Menu, Search, Target } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -11,15 +11,23 @@ import { Bot } from "lucide-react"
 import AiAssistantModal from "@/components/common/AiAssistantModal"
 
 export default function DashboardLayout() {
-  const { user, logout, isDemoMode } = useUser()
+  const { user, loading, logout, isDemoMode } = useUser()
   const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
   const [aiAssistantOpen, setAiAssistantOpen] = React.useState(false)
 
+  if (loading) {
+    return (
+      <div className="h-screen w-screen flex flex-col items-center justify-center bg-slate-50">
+        <div className="w-10 h-10 border-4 border-[#1B5E20]/20 border-t-[#1B5E20] rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   if (!user) {
-    return <div>{t("nav.redirecting")}</div> 
+    return <Navigate to="/auth" replace />;
   }
 
   const navItems = [

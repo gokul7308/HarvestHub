@@ -239,6 +239,7 @@ All screenshots captured from the verified running application:
 | **Crop Management** | ![Crop Management](evaluation/screenshots/crop-management.png) |
 | **AI Price Prediction** | ![AI Prediction](evaluation/screenshots/ai-prediction.png) |
 | **Platform Analytics** | ![Platform Analytics](evaluation/screenshots/analytics.png) |
+| **AI Decision Assistant** | ![AI Assistant](evaluation/screenshots/ai-assistant.png) |
 
 ---
 
